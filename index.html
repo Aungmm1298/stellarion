@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellarion - Quality Furniture for Every Room</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🛋️</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2D3E50',
+                        secondary: '#E8B86D',
+                        accent: '#F5F0E8',
+                        luxury: '#8B7355',
+                        dark: '#1A1F2E',
+                        light: '#FAFAF8'
+                    },
+                    fontFamily: {
+                        sans: ['Playfair Display', 'Georgia', 'serif'],
+                        body: ['Lato', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Three.js for Advanced 3D Rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        .animate-fadeIn {
+            animation: fadeIn 1s ease-out;
+        }
+        .animate-slideInLeft {
+            animation: slideInLeft 0.6s ease-out;
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 115, 85, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+        }
+        .product-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            background: white;
+        }
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(232, 184, 109, 0.1) 0%, rgba(139, 115, 85, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .product-card:hover::before {
+            opacity: 1;
+        }
+        .product-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px rgba(45, 62, 80, 0.15);
+        }
+        .luxury-border {
+            border: 1px solid rgba(139, 115, 85, 0.15);
+        }
+        .text-shadow-luxury {
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .bg-pattern {
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(232, 184, 109, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 115, 85, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(45, 62, 80, 0.03) 0%, transparent 50%);
+        }
+        .hover-grow {
+            transition: transform 0.3s ease;
+        }
+        .hover-grow:hover {
+            transform: scale(1.05);
+        }
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            --poster-color: transparent;
+            --progress-bar-color: #4F7CFF;
+        }
+        model-viewer::part(default-progress-bar) {
+            display: none;
+        }
+        #viewer3DContainer canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(232, 184, 109, 0.2);
+            border-top: 4px solid #E8B86D;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .view-3d-btn {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #2D3E50 0%, #1A1F2E 100%);
+            color: #E8B86D;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            border: 1px solid rgba(232, 184, 109, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(45, 62, 80, 0.3);
+        }
+        .view-3d-btn:hover {
+            background: linear-gradient(135deg, #E8B86D 0%, #D4A960 100%);
+            color: #2D3E50;
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 6px 25px rgba(232, 184, 109, 0.4);
+        }
+        .product-image-container {
+            position: relative;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+        }
+        .category-card {
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(45, 62, 80, 0.2);
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #E8B86D 0%, #D4A960 100%);
+            transition: all 0.3s ease;
+            color: #2D3E50;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #D4A960 0%, #C09650 100%);
+            box-shadow: 0 8px 30px rgba(232, 184, 109, 0.4);
+            transform: translateY(-2px);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #1A1F2E 0%, #2D3E50 50%, #3D4E60 100%);
+            position: relative;
+        }
+        .hero-gradient::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(232, 184, 109, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(232, 184, 109, 0.1) 0%, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-white font-sans">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-effect shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-5">
+                <!-- Logo -->
+                <div class="flex items-center space-x-4 cursor-pointer group">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary shadow-lg transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-300">
+                        <span class="text-2xl text-white font-bold">S</span>
+                    </div>
+                    <div>
+                        <span class="text-3xl font-bold text-primary tracking-tight group-hover:text-secondary transition-colors">Stellarion</span>
+                        <div class="text-xs text-luxury tracking-widest uppercase font-body">Fine Furniture</div>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-10">
+                    <a href="#products" class="text-primary hover:text-secondary font-body font-semibold text-sm uppercase tracking-wider transition-colors relative group">
+                        Collections
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-500"></span>
+                    </a>
+                    <a href="#rooms" class="text-primary hover:text-secondary font-body font-semibold text-sm uppercase tracking-wider transition-colors relative group">
+                        Rooms
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-500"></span>
+                    </a>
+                    <a href="#deals" class="text-primary hover:text-secondary font-body font-semibold text-sm uppercase tracking-wider transition-colors relative group">
+                        Featured
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-500"></span>
+                    </a>
+                    <a href="#inspiration" class="text-primary hover:text-secondary font-body font-semibold text-sm uppercase tracking-wider transition-colors relative group">
+                        Inspiration
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-500"></span>
+                    </a>
+                </nav>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-3">
+                    <!-- Search -->
+                    <div class="hidden lg:flex items-center">
+                        <div class="relative">
+                            <input type="text" id="searchInput" 
+                                   placeholder="Search our collection..." 
+                                   class="w-72 pl-10 pr-4 py-2.5 rounded-none border-b-2 border-accent focus:border-secondary bg-transparent focus:outline-none transition-all font-body text-sm">
+                            <i class="fas fa-search absolute left-0 top-1/2 -translate-y-1/2 text-luxury"></i>
+                        </div>
+                    </div>
+
+                    <!-- Wishlist -->
+                    <button id="wishlistBtn" class="relative p-3 hover:bg-accent/30 rounded-none transition-all group">
+                        <i class="fas fa-heart text-lg text-primary group-hover:text-secondary transition-colors"></i>
+                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-secondary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-body">0</span>
+                    </button>
+
+                    <!-- Cart -->
+                    <button id="cartBtn" class="relative p-3 hover:bg-accent/30 rounded-none transition-all group">
+                        <i class="fas fa-shopping-bag text-lg text-primary group-hover:text-secondary transition-colors"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-body">0</span>
+                    </button>
+
+                    <!-- Admin 3D Generator -->
+                    <button id="adminBtn" class="p-3 hover:bg-accent/30 rounded-none transition-all" title="3D Model Generator">
+                        <i class="fas fa-cube text-lg text-primary"></i>
+                    </button>
+
+                    <!-- User -->
+                    <button id="userBtn" class="hidden md:flex p-3 hover:bg-accent/30 rounded-none transition-all">
+                        <i class="fas fa-user text-lg text-primary"></i>
+                    </button>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobileMenuBtn" class="md:hidden p-3 hover:bg-accent/30">
+                        <i class="fas fa-bars text-lg text-primary"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search -->
+            <div class="lg:hidden pb-4">
+                <div class="relative">
+                    <input type="text" placeholder="Search our collection..." 
+                           class="w-full pl-10 pr-4 py-2.5 border-b-2 border-accent focus:border-secondary bg-transparent focus:outline-none font-body text-sm">
+                    <i class="fas fa-search absolute left-0 top-1/2 -translate-y-1/2 text-luxury"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative py-28 md:py-44 overflow-hidden hero-gradient">
+        <!-- Animated Decorative Elements -->
+        <div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-white/10 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 w-1/4 h-1/2 bg-gradient-to-tr from-white/10 to-transparent"></div>
+        <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-white/8 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-white/8 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-white/5 rounded-full blur-2xl"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <!-- Left Content -->
+                <div class="animate-slideInLeft">
+                    <div class="inline-block mb-6">
+                        <span class="text-white font-body font-semibold text-sm uppercase tracking-[0.3em] bg-white/10 px-6 py-3 rounded-full backdrop-blur-sm">✨ Luxury Collection 2025</span>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white text-shadow-luxury">
+                        Timeless Elegance
+                        <span class="block text-white/95 mt-3 text-5xl md:text-6xl">For Your Home</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl mb-12 text-white/90 leading-relaxed font-body max-w-2xl">
+                        Discover handcrafted furniture that transforms spaces into sophisticated sanctuaries. Every piece tells a story of craftsmanship and refined taste.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-6">
+                        <button class="btn-primary bg-white hover:bg-white/90 text-primary font-body font-bold py-5 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-white/30 uppercase tracking-wider text-sm">
+                            <i class="fas fa-arrow-right mr-3"></i>Explore Collection
+                        </button>
+                        <button class="bg-white/10 backdrop-blur-sm border-2 border-white hover:bg-white text-white hover:text-primary font-body font-bold py-5 px-12 rounded-full transition-all duration-300 uppercase tracking-wider text-sm">
+                            <i class="fas fa-book-open mr-3"></i>View Catalog
+                        </button>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-8 mt-20 pt-12 border-t border-white/20">
+                        <div class="text-center sm:text-left">
+                            <div class="text-5xl font-bold mb-2 text-white text-shadow-luxury">500+</div>
+                            <div class="text-white/90 font-body text-sm uppercase tracking-wider">Exclusive Pieces</div>
+                        </div>
+                        <div class="text-center sm:text-left">
+                            <div class="text-5xl font-bold mb-2 text-white text-shadow-luxury">15K+</div>
+                            <div class="text-white/90 font-body text-sm uppercase tracking-wider">Happy Clients</div>
+                        </div>
+                        <div class="text-center sm:text-left">
+                            <div class="text-5xl font-bold mb-2 text-white text-shadow-luxury">25+</div>
+                            <div class="text-white/90 font-body text-sm uppercase tracking-wider">Years Legacy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden lg:block animate-fadeIn">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-6">
+                            <div class="luxury-border bg-white p-6 shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 hover:-translate-y-2 rounded-2xl overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=500&fit=crop" alt="Modern sofa" class="w-full h-64 object-cover mb-4 rounded-xl">
+                                <h3 class="text-lg font-bold text-primary mb-1">Modern Living</h3>
+                                <p class="text-sm text-luxury/70 font-body">Contemporary designs</p>
+                            </div>
+                            <div class="luxury-border bg-white p-6 shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 hover:-translate-y-2 rounded-2xl overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400&h=300&fit=crop" alt="Dining" class="w-full h-48 object-cover mb-4 rounded-xl">
+                                <h3 class="text-lg font-bold text-primary mb-1">Dining Spaces</h3>
+                                <p class="text-sm text-luxury/70 font-body">Elegant gatherings</p>
+                            </div>
+                        </div>
+                        <div class="space-y-6 mt-12">
+                            <div class="luxury-border bg-white p-6 shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 hover:-translate-y-2 rounded-2xl overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop" alt="Bedroom" class="w-full h-48 object-cover mb-4 rounded-xl">
+                                <h3 class="text-lg font-bold text-primary mb-1">Restful Bedrooms</h3>
+                                <p class="text-sm text-luxury/70 font-body">Peaceful retreats</p>
+                            </div>
+                            <div class="luxury-border bg-white p-6 shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 hover:-translate-y-2 rounded-2xl overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400&h=500&fit=crop" alt="Office" class="w-full h-64 object-cover mb-4 rounded-xl">
+                                <h3 class="text-lg font-bold text-primary mb-1">Work Spaces</h3>
+                                <p class="text-sm text-luxury/70 font-body">Productive elegance</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Section -->
+    <section id="rooms" class="py-20 md:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <span class="text-secondary font-body font-semibold text-sm uppercase tracking-[0.3em] bg-accent/50 px-6 py-3 rounded-full">Curated Collections</span>
+                <h2 class="text-5xl md:text-6xl font-bold text-primary mb-6 mt-8">Shop by Room</h2>
+                <p class="text-luxury/70 text-lg font-body max-w-2xl mx-auto leading-relaxed">Explore our carefully selected furniture collections designed for every space in your home</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div data-category="living-room" class="category-card group cursor-pointer relative luxury-border bg-gradient-to-br from-white to-light hover:shadow-2xl transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-luxury/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative p-8">
+                        <div class="h-52 mb-6 flex items-center justify-center rounded-xl overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&h=200&fit=crop" alt="Living Room" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary mb-3 group-hover:text-secondary transition-colors">Living Room</h3>
+                        <p class="text-luxury/70 font-body mb-4 leading-relaxed">Sofas, sectionals & coffee tables</p>
+                        <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider">
+                            Explore <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-category="bedroom" class="group cursor-pointer relative overflow-hidden luxury-border bg-light hover:shadow-2xl transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-luxury/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative p-10">
+                        <div class="h-48 mb-6 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300&h=200&fit=crop" alt="Bedroom" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">Bedroom</h3>
+                        <p class="text-luxury/70 font-body mb-4">Beds, nightstands & wardrobes</p>
+                        <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider">
+                            Explore <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-category="dining" class="group cursor-pointer relative overflow-hidden luxury-border bg-light hover:shadow-2xl transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-luxury/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative p-10">
+                        <div class="h-48 mb-6 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=300&h=200&fit=crop" alt="Dining" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">Dining Room</h3>
+                        <p class="text-luxury/70 font-body mb-4">Tables, chairs & dining sets</p>
+                        <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider">
+                            Explore <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-category="office" class="group cursor-pointer relative overflow-hidden luxury-border bg-light hover:shadow-2xl transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-luxury/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative p-10">
+                        <div class="h-48 mb-6 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=300&h=200&fit=crop" alt="Office" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">Home Office</h3>
+                        <p class="text-luxury/70 font-body mb-4">Desks, chairs & storage</p>
+                        <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider">
+                            Explore <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-category="outdoor" class="group cursor-pointer relative overflow-hidden luxury-border bg-light hover:shadow-2xl transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-luxury/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative p-10">
+                        <div class="h-48 mb-6 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=300&h=200&fit=crop" alt="Outdoor" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">Outdoor</h3>
+                        <p class="text-luxury/70 font-body mb-4">Patio & garden furniture</p>
+                        <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider">
+                            Explore <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-category="storage" class="group cursor-pointer relative overflow-hidden luxury-border bg-light hover:shadow-2xl transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-luxury/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative p-10">
+                        <div class="h-48 mb-6 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=300&h=200&fit=crop" alt="Storage" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">Storage</h3>
+                        <p class="text-luxury/70 font-body mb-4">Shelves, cabinets & organizers</p>
+                        <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider">
+                            Explore <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Bar -->
+    <section class="py-8 bg-accent/30 border-y luxury-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap gap-6 justify-center items-center">
+                <div class="flex items-center gap-3">
+                    <label class="font-body font-bold text-primary text-sm uppercase tracking-wider">Category:</label>
+                    <select id="categoryFilter" class="px-6 py-3 border-2 luxury-border focus:border-secondary focus:outline-none bg-white cursor-pointer font-body text-sm hover:border-secondary transition-colors">
+                        <option value="all">All Collections</option>
+                        <option value="living-room">Living Room</option>
+                        <option value="bedroom">Bedroom</option>
+                        <option value="dining">Dining</option>
+                        <option value="office">Home Office</option>
+                        <option value="outdoor">Outdoor</option>
+                        <option value="storage">Storage</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <label class="font-body font-bold text-primary text-sm uppercase tracking-wider">Price:</label>
+                    <select id="priceFilter" class="px-6 py-3 border-2 luxury-border focus:border-secondary focus:outline-none bg-white cursor-pointer font-body text-sm hover:border-secondary transition-colors">
+                        <option value="all">All Prices</option>
+                        <option value="0-100">Under $100</option>
+                        <option value="100-300">$100 - $300</option>
+                        <option value="300-500">$300 - $500</option>
+                        <option value="500+">$500+</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <label class="font-body font-bold text-primary text-sm uppercase tracking-wider">Sort by:</label>
+                    <select id="sortFilter" class="px-6 py-3 border-2 luxury-border focus:border-secondary focus:outline-none bg-white cursor-pointer font-body text-sm hover:border-secondary transition-colors">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name">Name: A-Z</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-20 md:py-32 bg-light bg-pattern">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="deals" class="text-center mb-20">
+                <span class="text-secondary font-body font-semibold text-sm uppercase tracking-[0.3em] border-b-2 border-secondary pb-2">Featured Collection</span>
+                <h2 class="text-5xl md:text-6xl font-bold text-primary mb-6 mt-8">Signature Pieces</h2>
+                <p class="text-luxury/70 text-lg font-body max-w-2xl mx-auto">Each piece is meticulously crafted with attention to detail and timeless design</p>
+            </div>
+
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Products will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Inspiration Section -->
+    <section id="inspiration" class="py-20 md:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <span class="text-secondary font-body font-semibold text-sm uppercase tracking-[0.3em] border-b-2 border-secondary pb-2">Design Philosophy</span>
+                <h2 class="text-5xl md:text-6xl font-bold text-primary mb-6 mt-8">Interior Inspirations</h2>
+                <p class="text-luxury/70 text-lg font-body max-w-2xl mx-auto">Explore design styles that reflect your personality and elevate your living spaces</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="group cursor-pointer overflow-hidden luxury-border bg-light hover:shadow-2xl transition-all duration-500">
+                    <div class="relative h-96 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&h=800&fit=crop" alt="Modern Minimalism" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-12 h-0.5 bg-secondary"></div>
+                                <span class="font-body text-sm uppercase tracking-widest">Style 01</span>
+                            </div>
+                            <h3 class="text-3xl font-bold mb-3">Modern Minimalism</h3>
+                            <p class="text-white/90 font-body mb-4">Clean lines, functional design, and sophisticated simplicity</p>
+                            <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                                Discover More <i class="fas fa-arrow-right ml-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group cursor-pointer overflow-hidden luxury-border bg-light hover:shadow-2xl transition-all duration-500">
+                    <div class="relative h-96 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600210492486-724d285f4725?w=600&h=800&fit=crop" alt="Scandinavian" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-12 h-0.5 bg-secondary"></div>
+                                <span class="font-body text-sm uppercase tracking-widest">Style 02</span>
+                            </div>
+                            <h3 class="text-3xl font-bold mb-3">Scandinavian Warmth</h3>
+                            <p class="text-white/90 font-body mb-4">Cozy, inviting spaces with natural materials and light tones</p>
+                            <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                                Discover More <i class="fas fa-arrow-right ml-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group cursor-pointer overflow-hidden luxury-border bg-light hover:shadow-2xl transition-all duration-500">
+                    <div class="relative h-96 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=800&fit=crop" alt="Contemporary Luxury" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-12 h-0.5 bg-secondary"></div>
+                                <span class="font-body text-sm uppercase tracking-widest">Style 03</span>
+                            </div>
+                            <h3 class="text-3xl font-bold mb-3">Contemporary Luxury</h3>
+                            <p class="text-white/90 font-body mb-4">Refined elegance with rich textures and premium finishes</p>
+                            <div class="flex items-center text-secondary font-body font-semibold text-sm uppercase tracking-wider opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                                Discover More <i class="fas fa-arrow-right ml-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-secondary to-luxury">
+                            <span class="text-2xl text-white font-bold">S</span>
+                        </div>
+                        <div>
+                            <span class="text-2xl font-bold">Stellarion</span>
+                            <div class="text-xs text-secondary tracking-widest uppercase">Fine Furniture</div>
+                        </div>
+                    </div>
+                    <p class="text-white/70 mb-8 font-body leading-relaxed">Crafting timeless pieces that transform houses into homes. Experience luxury, comfort, and sophistication.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-11 h-11 bg-white/10 hover:bg-secondary rounded-none flex items-center justify-center transition-all hover:scale-110">
+                            <i class="fab fa-facebook-f text-sm"></i>
+                        </a>
+                        <a href="#" class="w-11 h-11 bg-white/10 hover:bg-secondary rounded-none flex items-center justify-center transition-all hover:scale-110">
+                            <i class="fab fa-instagram text-sm"></i>
+                        </a>
+                        <a href="#" class="w-11 h-11 bg-white/10 hover:bg-secondary rounded-none flex items-center justify-center transition-all hover:scale-110">
+                            <i class="fab fa-pinterest text-sm"></i>
+                        </a>
+                        <a href="#" class="w-11 h-11 bg-white/10 hover:bg-secondary rounded-none flex items-center justify-center transition-all hover:scale-110">
+                            <i class="fab fa-linkedin-in text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Shop -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6 border-b-2 border-secondary pb-3 inline-block">Collections</h4>
+                    <ul class="space-y-3 font-body">
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Living Room</a></li>
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Bedroom</a></li>
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Dining Room</a></li>
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Home Office</a></li>
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Outdoor</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Service -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6 border-b-2 border-secondary pb-3 inline-block">Customer Care</h4>
+                    <ul class="space-y-3 font-body">
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Contact Us</a></li>
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Shipping & Delivery</a></li>
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Returns Policy</a></li>
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>White Glove Service</a></li>
+                        <li><a href="#" class="text-white/70 hover:text-secondary transition-colors flex items-center group"><i class="fas fa-angle-right mr-2 group-hover:translate-x-1 transition-transform"></i>Design Consultation</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6 border-b-2 border-secondary pb-3 inline-block">Stay Connected</h4>
+                    <p class="text-white/70 mb-6 font-body">Subscribe for exclusive offers, design tips, and new arrivals</p>
+                    <div class="space-y-3">
+                        <input type="email" placeholder="Your email address" class="w-full px-5 py-3 bg-white/10 border-2 border-white/20 focus:border-secondary focus:outline-none text-white placeholder-white/50 font-body transition-colors">
+                        <button class="w-full bg-secondary hover:bg-luxury text-primary hover:text-white font-body font-bold py-3 px-6 transition-all duration-300 uppercase tracking-wider text-sm">
+                            Subscribe
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom -->
+            <div class="pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-white/60 font-body text-sm">&copy; 2025 Stellarion Fine Furniture. All rights reserved.</p>
+                <div class="flex gap-6 font-body text-sm">
+                    <a href="#" class="text-white/60 hover:text-secondary transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-white/60 hover:text-secondary transition-colors">Terms of Service</a>
+                    <a href="#" class="text-white/60 hover:text-secondary transition-colors">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col luxury-border">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b luxury-border">
+                <h2 class="text-2xl font-bold text-primary">Shopping Cart</h2>
+                <button id="closeCart" class="text-luxury/60 hover:text-primary text-3xl leading-none transition-colors">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div id="cartItems" class="flex-1 overflow-y-auto p-6">
+                <!-- Cart items will be inserted here -->
+            </div>
+
+            <!-- Footer -->
+            <div class="p-6 border-t luxury-border bg-light">
+                <div class="flex items-center justify-between mb-4 text-2xl font-bold">
+                    <span>Total:</span>
+                    <span id="cartTotal" class="text-secondary">$0.00</span>
+                </div>
+                <button class="w-full bg-primary hover:bg-secondary text-white hover:text-primary font-body font-bold py-4 transition-all transform hover:scale-105 uppercase tracking-wider">
+                    <i class="fas fa-lock mr-2"></i>Proceed to Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Modal -->
+    <div id="wishlistModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col luxury-border">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b luxury-border bg-light">
+                <div>
+                    <h2 class="text-2xl font-bold text-primary">My Wishlist</h2>
+                    <p class="text-sm text-luxury/70 font-body mt-1">Your favorite furniture pieces</p>
+                </div>
+                <button id="closeWishlist" class="text-luxury/60 hover:text-primary text-3xl leading-none transition-colors">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div id="wishlistItems" class="flex-1 overflow-y-auto p-6">
+                <!-- Wishlist items will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Product Viewer Modal -->
+    <div id="viewer3DModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+        <div class="bg-white shadow-2xl w-full max-w-5xl h-[80vh] flex flex-col luxury-border">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b luxury-border bg-light">
+                <div>
+                    <h2 class="text-2xl font-bold text-primary" id="viewer3DTitle">3D Product View</h2>
+                    <p class="text-sm text-luxury/70 font-body mt-1">Rotate, zoom, and explore in 3D</p>
+                </div>
+                <button id="close3DViewer" class="text-luxury/60 hover:text-primary text-3xl leading-none transition-colors">
+                    &times;
+                </button>
+            </div>
+
+            <!-- 3D Viewer Body -->
+            <div class="flex-1 p-6 bg-gradient-to-br from-accent/30 to-light">
+                <div id="viewer3DContainer" class="w-full h-full flex items-center justify-center">
+                    <!-- 3D model will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Footer Controls -->
+            <div class="p-6 border-t luxury-border bg-light">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-luxury/70 font-body">
+                        <i class="fas fa-mouse-pointer mr-2"></i>Click and drag to rotate • Scroll to zoom
+                    </div>
+                    <button id="add3DToCart" class="bg-primary hover:bg-secondary text-white hover:text-primary font-body font-bold py-3 px-8 transition-all uppercase tracking-wider text-sm">
+                        <i class="fas fa-shopping-bag mr-2"></i>Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="userModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+        <div class="bg-white shadow-2xl w-full max-w-md luxury-border">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b luxury-border bg-light">
+                <h2 class="text-2xl font-bold text-primary">My Account</h2>
+                <button id="closeUserModal" class="text-luxury/60 hover:text-primary text-3xl leading-none transition-colors">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="p-6">
+                <h3 class="text-xl font-bold text-primary mb-6">Sign In</h3>
+                <form onsubmit="handleLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-body font-semibold text-primary mb-2">Email</label>
+                        <input type="email" id="loginEmail" required 
+                               class="w-full px-4 py-3 border-2 border-accent focus:border-secondary bg-transparent focus:outline-none transition-all font-body"
+                               placeholder="your@email.com">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-body font-semibold text-primary mb-2">Password</label>
+                        <input type="password" id="loginPassword" required 
+                               class="w-full px-4 py-3 border-2 border-accent focus:border-secondary bg-transparent focus:outline-none transition-all font-body"
+                               placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-secondary text-white hover:text-primary font-body font-bold py-3 transition-all uppercase tracking-wider mb-4">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                    </button>
+                </form>
+                <div class="text-center">
+                    <p class="text-sm text-luxury/70 font-body">Don't have an account? 
+                        <button onclick="showRegisterForm()" class="text-secondary hover:text-primary font-bold">Register</button>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="p-6 hidden">
+                <h3 class="text-xl font-bold text-primary mb-6">Create Account</h3>
+                <form onsubmit="handleRegister(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-body font-semibold text-primary mb-2">Full Name</label>
+                        <input type="text" id="registerName" required 
+                               class="w-full px-4 py-3 border-2 border-accent focus:border-secondary bg-transparent focus:outline-none transition-all font-body"
+                               placeholder="John Doe">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-body font-semibold text-primary mb-2">Email</label>
+                        <input type="email" id="registerEmail" required 
+                               class="w-full px-4 py-3 border-2 border-accent focus:border-secondary bg-transparent focus:outline-none transition-all font-body"
+                               placeholder="your@email.com">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-body font-semibold text-primary mb-2">Password</label>
+                        <input type="password" id="registerPassword" required minlength="6"
+                               class="w-full px-4 py-3 border-2 border-accent focus:border-secondary bg-transparent focus:outline-none transition-all font-body"
+                               placeholder="Min. 6 characters">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-body font-semibold text-primary mb-2">Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" required minlength="6"
+                               class="w-full px-4 py-3 border-2 border-accent focus:border-secondary bg-transparent focus:outline-none transition-all font-body"
+                               placeholder="Re-enter password">
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-secondary text-white hover:text-primary font-body font-bold py-3 transition-all uppercase tracking-wider mb-4">
+                        <i class="fas fa-user-plus mr-2"></i>Create Account
+                    </button>
+                </form>
+                <div class="text-center">
+                    <p class="text-sm text-luxury/70 font-body">Already have an account? 
+                        <button onclick="showLoginForm()" class="text-secondary hover:text-primary font-bold">Sign In</button>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Profile View -->
+            <div id="profileView" class="p-6 hidden">
+                <div class="text-center mb-6">
+                    <div class="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="fas fa-user text-4xl text-white"></i>
+                    </div>
+                    <h3 id="profileName" class="text-2xl font-bold text-primary mb-1">User Name</h3>
+                    <p id="profileEmail" class="text-sm text-luxury/70 font-body">user@email.com</p>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <div class="p-4 bg-accent/30 luxury-border">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-body font-semibold text-primary">Phone:</span>
+                            <span id="profilePhone" class="text-sm text-luxury/70 font-body">Not set</span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-accent/30 luxury-border">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-body font-semibold text-primary">Address:</span>
+                            <span id="profileAddress" class="text-sm text-luxury/70 font-body">Not set</span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-accent/30 luxury-border">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-body font-semibold text-primary">Member Since:</span>
+                            <span id="profileJoinDate" class="text-sm text-luxury/70 font-body">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button class="w-full bg-accent hover:bg-secondary hover:text-white text-primary font-body font-bold py-3 transition-all uppercase tracking-wider text-sm">
+                        <i class="fas fa-box mr-2"></i>My Orders
+                    </button>
+                    <button class="w-full bg-accent hover:bg-secondary hover:text-white text-primary font-body font-bold py-3 transition-all uppercase tracking-wider text-sm">
+                        <i class="fas fa-heart mr-2"></i>My Wishlist
+                    </button>
+                    <button onclick="handleLogout()" class="w-full bg-primary hover:bg-luxury/20 text-white hover:text-primary font-body font-bold py-3 transition-all uppercase tracking-wider text-sm">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin 3D Generator Modal -->
+    <div id="adminModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cream rounded-none max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="sticky top-0 bg-primary text-white p-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-display font-semibold">3D Model Generator</h2>
+                    <p class="text-xs text-secondary mt-1">
+                        <i class="fas fa-server mr-1"></i>
+                        <span id="serverStatus">Backend Mode: localhost:3000</span>
+                    </p>
+                </div>
+                <button onclick="closeAdminModal()" class="text-white hover:text-secondary transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- Upload Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-display font-semibold text-primary mb-4">Convert Image to 3D Model</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-primary mb-2">Product Name</label>
+                            <input type="text" id="productNameInput" placeholder="e.g., Modern Leather Sofa"
+                                   class="w-full px-4 py-3 border-2 border-accent focus:border-secondary focus:outline-none font-body">
+                        </div>
+
+                        <!-- Tab Selection -->
+                        <div class="flex gap-2 border-b-2 border-accent">
+                            <button id="urlTab" onclick="switchTab('url')" 
+                                    class="tab-button flex-1 py-2 font-semibold transition-all border-b-2 border-secondary text-primary">
+                                <i class="fas fa-link mr-1"></i>From URL
+                            </button>
+                            <button id="uploadTab" onclick="switchTab('upload')" 
+                                    class="tab-button flex-1 py-2 font-semibold transition-all border-b-2 border-transparent text-gray-500 hover:text-primary">
+                                <i class="fas fa-upload mr-1"></i>Upload File
+                            </button>
+                        </div>
+
+                        <!-- URL Input Tab -->
+                        <div id="urlTabContent" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-primary mb-2">Image URL</label>
+                                <div class="flex gap-2">
+                                    <input type="url" id="imageUrlInput" placeholder="https://images.unsplash.com/photo-..."
+                                           class="flex-1 px-4 py-3 border-2 border-accent focus:border-secondary focus:outline-none font-body">
+                                    <button onclick="useExampleURL()" 
+                                            class="px-4 py-3 bg-accent text-primary font-semibold hover:bg-accent/80 transition-all whitespace-nowrap">
+                                        <i class="fas fa-magic mr-1"></i>Example
+                                    </button>
+                                </div>
+                                <div class="text-xs text-gray-600 mt-2">
+                                    <p class="font-semibold text-primary mb-1">✅ Valid URLs (direct image links):</p>
+                                    <p>• https://images.unsplash.com/photo-xxx.jpg</p>
+                                    <p>• https://i.imgur.com/abc123.png</p>
+                                    <p class="font-semibold text-red-600 mt-2 mb-1">❌ Invalid URLs (search/page URLs):</p>
+                                    <p>• https://www.bing.com/images/search?...</p>
+                                    <p>• https://www.google.com/search?...</p>
+                                    <p class="mt-2 text-secondary font-semibold">💡 Tip: Right-click image → "Copy image address"</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload File Tab -->
+                        <div id="uploadTabContent" class="space-y-4 hidden">
+                            <div>
+                                <label class="block text-sm font-semibold text-primary mb-2">Upload Image</label>
+                                <div class="border-2 border-dashed border-accent rounded-lg p-6 text-center hover:border-secondary transition-all cursor-pointer"
+                                     onclick="document.getElementById('fileInput').click()">
+                                    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-accent mb-2"></i>
+                                    <p class="text-sm font-semibold text-primary">Click to upload image</p>
+                                    <p class="text-xs text-gray-600 mt-1">Or drag and drop (JPG, PNG, WEBP)</p>
+                                </div>
+                                <div id="uploadPreview" class="mt-3 hidden">
+                                    <img id="previewImage" class="w-full h-48 object-cover rounded-lg border-2 border-accent">
+                                    <p id="uploadStatus" class="text-xs text-center mt-2 text-gray-600"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="testAPIConnection()" 
+                                    class="flex-1 bg-accent text-primary py-3 px-6 font-semibold hover:bg-accent/80 transition-all">
+                                <i class="fas fa-plug mr-2"></i>Test API
+                            </button>
+                            <button onclick="startGeneration()" 
+                                    class="flex-1 bg-primary text-white py-3 px-6 font-semibold hover:bg-primary/90 transition-all">
+                                <i class="fas fa-magic mr-2"></i>Generate 3D Model
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Section -->
+                <div id="progressSection" class="mb-8 hidden">
+                    <h3 class="text-lg font-display font-semibold text-primary mb-4">Generation Progress</h3>
+                    
+                    <div class="bg-white p-4 rounded-lg border-2 border-accent">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-semibold text-primary" id="statusText">Starting...</span>
+                            <span class="text-sm text-secondary font-semibold" id="progressPercent">0%</span>
+                        </div>
+                        
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div id="progressBar" class="bg-secondary h-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+
+                        <p class="text-xs text-gray-600 mt-2" id="taskIdDisplay"></p>
+                    </div>
+                </div>
+
+                <!-- Recent Models Section -->
+                <div id="recentModels" class="mb-8">
+                    <h3 class="text-lg font-display font-semibold text-primary mb-4">Recent 3D Models</h3>
+                    <div id="modelsList" class="space-y-2">
+                        <p class="text-gray-500 text-center py-8">No models generated yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXX", // Replace with your API key
+            authDomain: "stellarion-3d.firebaseapp.com", // Replace
+            projectId: "stellarion-3d", // Replace
+            storageBucket: "stellarion-3d.appspot.com", // Replace
+            messagingSenderId: "123456789012", // Replace
+            appId: "1:123456789012:web:xxxxxxxxxxxxx" // Replace
+        };
+
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.warn('Firebase initialization skipped or failed:', error.message);
+        }
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>
