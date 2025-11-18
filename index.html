@@ -5,15 +5,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stellarion - Quality Furniture for Every Room</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🛋️</text></svg>">
-    <!-- Custom CSS (No Tailwind) -->
-    <link rel="stylesheet" href="styles.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Three.js for Advanced 3D Rendering -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        /* Additional Page-Specific Styles */
+        /* Bootstrap Custom Theme */
+        :root {
+            --bs-primary: #667eea;
+            --bs-secondary: #764ba2;
+            --bs-success: #11998e;
+            --bs-info: #2193b0;
+            --bs-warning: #f6d365;
+            --bs-danger: #f5576c;
+            --bs-light: #f8fafc;
+            --bs-dark: #0f172a;
+            --bs-font-sans-serif: 'Montserrat', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            background-attachment: fixed;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+        
+        /* Header Styles */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 1px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card:hover {
+            transform: translateY(-16px) scale(1.02);
+            box-shadow: 0 24px 48px rgba(102, 126, 234, 0.3);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-img-top {
+            transition: transform 0.5s ease;
+        }
+        
+        .card:hover .card-img-top {
+            transform: scale(1.1);
+        }
+        
+        /* Button Styles */
+        .btn {
+            border-radius: 50px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+        
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        /* Badge Styles */
+        .badge {
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+        }
+        
+        /* Form Styles */
+        .form-control {
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        /* Animations */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -24,86 +192,74 @@
                 transform: translateY(0);
             }
         }
+        
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+        
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
         }
+        
         .animate-fadeInUp {
             animation: fadeInUp 0.8s ease-out;
         }
+        
         .animate-fadeIn {
             animation: fadeIn 1s ease-out;
         }
-        .animate-slideInLeft {
-            animation: slideInLeft 0.6s ease-out;
-        }
+        
         .animate-float {
             animation: float 6s ease-in-out infinite;
         }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(139, 115, 85, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
-        }
-        .product-card {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        /* Hero Section */
+        .hero-section {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
             position: relative;
-            overflow: hidden;
-            border-radius: 12px;
-            background: white;
         }
-        .product-card::before {
+        
+        .hero-section::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(232, 184, 109, 0.1) 0%, rgba(139, 115, 85, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
         }
-        .product-card:hover::before {
-            opacity: 1;
+        
+        /* Price Gradient */
+        .price-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
         }
-        .product-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 60px rgba(45, 62, 80, 0.15);
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
         }
-        .luxury-border {
-            border: 1px solid rgba(139, 115, 85, 0.15);
+        
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
         }
-        .text-shadow-luxury {
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px;
         }
-        .bg-pattern {
-            background-image: 
-                radial-gradient(circle at 20% 50%, rgba(232, 184, 109, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(139, 115, 85, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(45, 62, 80, 0.03) 0%, transparent 50%);
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        .hover-grow {
-            transition: transform 0.3s ease;
-        }
-        .hover-grow:hover {
-            transform: scale(1.05);
-        }
+        
         model-viewer {
             width: 100%;
             height: 100%;
@@ -1021,5 +1177,8 @@
     </script>
 
     <script src="script.js"></script>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
