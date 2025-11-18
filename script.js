@@ -132,10 +132,6 @@ async function check3DStatus(taskId) {
                     status: data.status,
                     progress: data.progress,
                     modelUrl: data.modelUrl,
-                    objUrl: data.objUrl,
-                    fbxUrl: data.fbxUrl,
-                    usdz: data.usdz,
-                    allFormats: data.allFormats,
                     thumbnailUrl: data.thumbnailUrl
                 };
             } else {
@@ -156,10 +152,6 @@ async function check3DStatus(taskId) {
                     status: data.status,
                     progress: data.progress,
                     modelUrl: data.model_urls?.glb,
-                    objUrl: data.model_urls?.obj,
-                    fbxUrl: data.model_urls?.fbx,
-                    usdz: data.model_urls?.usdz,
-                    allFormats: data.model_urls,
                     thumbnailUrl: data.thumbnail_url
                 };
             } else {
@@ -190,14 +182,7 @@ async function waitFor3DCompletion(taskId, onProgress) {
 
                 if (status.status === 'SUCCEEDED') {
                     clearInterval(pollInterval);
-                    // Return all available formats
-                    resolve({
-                        glb: status.modelUrl,
-                        obj: status.objUrl,
-                        fbx: status.fbxUrl,
-                        usdz: status.usdz,
-                        allFormats: status.allFormats
-                    });
+                    resolve(status.modelUrl);
                 } else if (status.status === 'FAILED') {
                     clearInterval(pollInterval);
                     reject(new Error('3D model generation failed'));
@@ -1619,7 +1604,7 @@ async function startGeneration() {
         document.getElementById('taskIdDisplay').textContent = `Task ID: ${taskId}`;
         
         // Wait for completion
-        const modelFormats = await waitFor3DCompletion(taskId, (status) => {
+        const modelUrl = await waitFor3DCompletion(taskId, (status) => {
             // Update progress UI
             const progress = status.progress || 0;
             document.getElementById('statusText').textContent = status.status;
@@ -1632,24 +1617,11 @@ async function startGeneration() {
         document.getElementById('statusText').textContent = 'Completed!';
         document.getElementById('progressPercent').textContent = '100%';
         document.getElementById('progressBar').style.width = '100%';
-        
-        // Show download options for all formats
-        const taskDisplay = document.getElementById('taskIdDisplay');
-        if (taskDisplay && modelFormats.allFormats) {
-            let downloadLinks = '<div style="margin-top: 15px;"><strong>📥 Download Formats:</strong><br>';
-            if (modelFormats.glb) downloadLinks += `<a href="${modelFormats.glb}" download style="color: #667eea; margin: 5px 10px 5px 0; display: inline-block;">⬇️ GLB</a>`;
-            if (modelFormats.obj) downloadLinks += `<a href="${modelFormats.obj}" download style="color: #667eea; margin: 5px 10px 5px 0; display: inline-block;">⬇️ OBJ</a>`;
-            if (modelFormats.fbx) downloadLinks += `<a href="${modelFormats.fbx}" download style="color: #667eea; margin: 5px 10px 5px 0; display: inline-block;">⬇️ FBX</a>`;
-            if (modelFormats.usdz) downloadLinks += `<a href="${modelFormats.usdz}" download style="color: #667eea; margin: 5px 10px 5px 0; display: inline-block;">⬇️ USDZ</a>`;
-            downloadLinks += '</div>';
-            taskDisplay.innerHTML += downloadLinks;
-        }
 
-        // Ask user if they want to add it to the website (use GLB for 3D viewer)
-        const modelUrl = modelFormats.glb || modelFormats.obj;
+        // Ask user if they want to add it to the website
         setTimeout(() => {
-            if (confirm(`✅ 3D Model Generated Successfully!\n\nAvailable formats: ${Object.keys(modelFormats.allFormats || {}).join(', ').toUpperCase()}\n\nDo you want to add "${productName}" to your website catalog?\n\nThis will create a new product with:\n- Product name: ${productName}\n- Product image\n- 3D model viewer (GLB format)\n- Default price: $999`)) {
-                addProductToWebsite(productName, imageUrl, modelFormats);
+            if (confirm(`✅ 3D Model Generated Successfully!\n\nDo you want to add "${productName}" to your website catalog?\n\nThis will create a new product with:\n- Product name: ${productName}\n- Product image\n- 3D model viewer\n- Default price: $999`)) {
+                addProductToWebsite(productName, imageUrl, modelUrl);
             }
             loadRecentModels();
             resetGenerationForm();
@@ -1804,10 +1776,8 @@ function previewModel(modelUrl) {
 /**
  * Add generated 3D model as a new product to the website
  */
-function addProductToWebsite(productName, imageUrl, modelFormats) {
+function addProductToWebsite(productName, imageUrl, model3DUrl) {
     try {
-        console.log('🔍 addProductToWebsite called with:', { productName, imageUrl, modelFormats });
-        
         // Generate new product ID
         const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
         
@@ -1822,25 +1792,6 @@ function addProductToWebsite(productName, imageUrl, modelFormats) {
             category = 'dining';
         }
         
-        // Handle both old (string) and new (object) format
-        let model3DUrl, objUrl, fbxUrl, usdzUrl;
-        
-        if (typeof modelFormats === 'string') {
-            // Old format: just a GLB URL string
-            model3DUrl = modelFormats;
-            objUrl = null;
-            fbxUrl = null;
-            usdzUrl = null;
-        } else if (typeof modelFormats === 'object' && modelFormats !== null) {
-            // New format: object with multiple formats
-            model3DUrl = modelFormats.glb || modelFormats.modelUrl;
-            objUrl = modelFormats.obj || modelFormats.objUrl;
-            fbxUrl = modelFormats.fbx || modelFormats.fbxUrl;
-            usdzUrl = modelFormats.usdz;
-        }
-        
-        console.log('🔍 Extracted URLs:', { model3DUrl, objUrl, fbxUrl, usdzUrl });
-        
         // Create new product object
         const newProduct = {
             id: newId,
@@ -1849,16 +1800,11 @@ function addProductToWebsite(productName, imageUrl, modelFormats) {
             category: category,
             image: imageUrl,
             model3D: model3DUrl,
-            model3D_obj: objUrl,
-            model3D_fbx: fbxUrl,
-            model3D_usdz: usdzUrl,
             description: `AI-generated 3D model of ${productName}. High-quality furniture piece with realistic rendering and interactive 3D viewing.`,
             rating: 4.5,
             reviews: 0,
             badge: 'New'
         };
-        
-        console.log('🔍 New product created:', newProduct);
         
         // Add to products array at the beginning
         products.unshift(newProduct);
@@ -1899,19 +1845,9 @@ function loadCustomProducts() {
     if (savedProducts) {
         try {
             const customProducts = JSON.parse(savedProducts);
-            
-            // Add custom products to the beginning of the array
-            // Only add if they don't already exist (check by ID)
-            customProducts.forEach(customProduct => {
-                const existingIndex = products.findIndex(p => p.id === customProduct.id);
-                if (existingIndex === -1) {
-                    // Product doesn't exist, add it to the beginning
-                    products.unshift(customProduct);
-                }
-            });
-            
+            // Merge custom products with default products (custom first)
+            products = [...customProducts, ...products];
             console.log(`✅ Loaded ${customProducts.length} custom products from localStorage`);
-            console.log(`📦 Total products in catalog: ${products.length}`);
         } catch (e) {
             console.error('Error loading custom products:', e);
         }
@@ -2206,3 +2142,139 @@ window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.handleLogout = handleLogout;
 window.showUserProfile = showUserProfile;
+
+// ============================================
+// PARTNER BRANDS PRODUCTS
+// ============================================
+const partnerProducts = [
+    // IKEA Products
+    { id: 5001, name: 'KALLAX Shelf Unit', price: 89, category: 'storage', brand: 'ikea', brandName: 'IKEA',
+      image: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?w=800',
+      description: 'Versatile storage solution perfect for any room',
+      rating: 4.7, reviews: 1250, url: 'https://www.ikea.com' },
+    { id: 5002, name: 'POÄNG Armchair', price: 129, category: 'living-room', brand: 'ikea', brandName: 'IKEA',
+      image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800',
+      description: 'Timeless design with layer-glued bent wood frame',
+      rating: 4.6, reviews: 890, url: 'https://www.ikea.com' },
+    { id: 5003, name: 'HEMNES Dresser', price: 299, category: 'bedroom', brand: 'ikea', brandName: 'IKEA',
+      image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=800',
+      description: 'Classic dresser with 8 smooth-running drawers',
+      rating: 4.5, reviews: 670, url: 'https://www.ikea.com' },
+    
+    // Wayfair Products
+    { id: 5004, name: 'Modern Velvet Sofa', price: 899, category: 'living-room', brand: 'wayfair', brandName: 'Wayfair',
+      image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800',
+      description: 'Luxurious velvet upholstery with button tufting',
+      rating: 4.8, reviews: 540, url: 'https://www.wayfair.com' },
+    { id: 5005, name: 'Industrial Dining Table', price: 649, category: 'dining', brand: 'wayfair', brandName: 'Wayfair',
+      image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800',
+      description: 'Rustic wood top with metal frame, seats 6-8',
+      rating: 4.7, reviews: 423, url: 'https://www.wayfair.com' },
+    
+    // West Elm Products
+    { id: 5006, name: 'Mid-Century Desk', price: 599, category: 'office', brand: 'west-elm', brandName: 'West Elm',
+      image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=800',
+      description: 'Clean-lined desk with FSC-certified wood',
+      rating: 4.9, reviews: 310, url: 'https://www.westelm.com' },
+    { id: 5007, name: 'Upholstered Platform Bed', price: 1299, category: 'bedroom', brand: 'west-elm', brandName: 'West Elm',
+      image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800',
+      description: 'Modern platform bed with sustainably sourced wood',
+      rating: 4.8, reviews: 267, url: 'https://www.westelm.com' },
+    
+    // CB2 Products
+    { id: 5008, name: 'Uno Cement Side Table', price: 199, category: 'living-room', brand: 'cb2', brandName: 'CB2',
+      image: 'https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=800',
+      description: 'Contemporary side table with cement top',
+      rating: 4.6, reviews: 189, url: 'https://www.cb2.com' },
+    { id: 5009, name: 'Slope Leather Chair', price: 749, category: 'living-room', brand: 'cb2', brandName: 'CB2',
+      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800',
+      description: 'Modern leather lounge chair with clean lines',
+      rating: 4.7, reviews: 156, url: 'https://www.cb2.com' },
+    
+    // Pottery Barn Products
+    { id: 5010, name: 'Buchanan Sectional', price: 2499, category: 'living-room', brand: 'pottery-barn', brandName: 'Pottery Barn',
+      image: 'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=800',
+      description: 'Generously sized sectional with down-blend cushions',
+      rating: 4.9, reviews: 445, url: 'https://www.potterybarn.com' },
+    { id: 5011, name: 'Banks Dining Table', price: 1199, category: 'dining', brand: 'pottery-barn', brandName: 'Pottery Barn',
+      image: 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?w=800',
+      description: 'Extendable dining table, seats 6-10 people',
+      rating: 4.8, reviews: 378, url: 'https://www.potterybarn.com' },
+    { id: 5012, name: 'Lorraine Nightstand', price: 399, category: 'bedroom', brand: 'pottery-barn', brandName: 'Pottery Barn',
+      image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800',
+      description: 'Elegant nightstand with brass hardware',
+      rating: 4.7, reviews: 234, url: 'https://www.potterybarn.com' }
+];
+
+let currentPartnerBrand = 'all';
+
+function renderPartnerProducts() {
+    const grid = document.getElementById('partnerProductsGrid');
+    if (!grid) return;
+
+    const filtered = currentPartnerBrand === 'all' 
+        ? partnerProducts 
+        : partnerProducts.filter(p => p.brand === currentPartnerBrand);
+
+    grid.innerHTML = filtered.map(product => `
+        <div class="bg-white border-2 luxury-border hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group">
+            <div class="relative overflow-hidden">
+                <span class="absolute top-3 left-3 bg-gradient-to-r from-primary to-luxury text-white px-3 py-1 text-xs font-bold uppercase tracking-wider z-10">
+                    ${product.brandName}
+                </span>
+                <img src="${product.image}" alt="${product.name}" class="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-700">
+            </div>
+            
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">${product.name}</h3>
+                
+                <div class="flex items-center gap-1 mb-3">
+                    ${'<i class="fas fa-star text-yellow-400 text-sm"></i>'.repeat(Math.floor(product.rating))}
+                    <span class="text-luxury/70 text-sm font-body ml-2">${product.rating} (${product.reviews})</span>
+                </div>
+                
+                <p class="text-luxury/70 text-sm font-body mb-4 line-clamp-2">${product.description}</p>
+                
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-3xl font-bold text-primary currency-display">$${product.price}</span>
+                </div>
+                
+                <div class="flex gap-3">
+                    <a href="${product.url}" target="_blank" rel="noopener" class="flex-1 bg-primary text-white py-3 px-4 hover:bg-secondary hover:text-primary transition-all text-center font-body font-semibold text-sm uppercase tracking-wider">
+                        View at ${product.brandName}
+                    </a>
+                    <button onclick="toggleWishlist(${product.id}, true)" class="p-3 border-2 luxury-border hover:border-secondary hover:text-secondary transition-colors">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    updateCurrencyDisplay();
+}
+
+function filterPartnerProducts(brand) {
+    currentPartnerBrand = brand;
+    
+    // Update button styles
+    document.querySelectorAll('.partner-brand-btn').forEach(btn => {
+        if (btn.dataset.brand === brand || (brand === 'all' && btn.textContent.trim() === 'All Brands')) {
+            btn.classList.add('active', 'bg-secondary', 'border-secondary', 'text-white');
+            btn.classList.remove('border-luxury/30', 'text-primary');
+        } else {
+            btn.classList.remove('active', 'bg-secondary', 'border-secondary', 'text-white');
+            btn.classList.add('border-luxury/30', 'text-primary');
+        }
+    });
+    
+    renderPartnerProducts();
+}
+
+// Initialize partner products on page load
+document.addEventListener('DOMContentLoaded', () => {
+    renderPartnerProducts();
+});
+
+window.filterPartnerProducts = filterPartnerProducts;
+

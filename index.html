@@ -484,6 +484,48 @@
         </div>
     </section>
 
+    <!-- Partner Brands Section -->
+    <section id="partner-brands" class="py-20 md:py-24 bg-gradient-to-br from-primary/5 to-accent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-secondary font-body font-semibold text-sm uppercase tracking-[0.3em] border-b-2 border-secondary pb-2">Partner Collections</span>
+                <h2 class="text-4xl md:text-5xl font-bold text-primary mb-6 mt-8">Featured Brand Products</h2>
+                <p class="text-luxury/70 text-lg font-body max-w-2xl mx-auto">Discover curated furniture from leading brands including IKEA, Wayfair, West Elm, CB2, and Pottery Barn</p>
+            </div>
+
+            <!-- Brand Filter Tabs -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button onclick="filterPartnerProducts('all')" class="partner-brand-btn active px-6 py-3 border-2 border-secondary bg-secondary text-white font-body font-semibold text-sm uppercase tracking-wider transition-all hover:shadow-lg" data-brand="all">
+                    All Brands
+                </button>
+                <button onclick="filterPartnerProducts('ikea')" class="partner-brand-btn px-6 py-3 border-2 border-luxury/30 text-primary font-body font-semibold text-sm uppercase tracking-wider transition-all hover:border-secondary hover:text-secondary" data-brand="ikea">
+                    IKEA
+                </button>
+                <button onclick="filterPartnerProducts('wayfair')" class="partner-brand-btn px-6 py-3 border-2 border-luxury/30 text-primary font-body font-semibold text-sm uppercase tracking-wider transition-all hover:border-secondary hover:text-secondary" data-brand="wayfair">
+                    Wayfair
+                </button>
+                <button onclick="filterPartnerProducts('west-elm')" class="partner-brand-btn px-6 py-3 border-2 border-luxury/30 text-primary font-body font-semibold text-sm uppercase tracking-wider transition-all hover:border-secondary hover:text-secondary" data-brand="west-elm">
+                    West Elm
+                </button>
+                <button onclick="filterPartnerProducts('cb2')" class="partner-brand-btn px-6 py-3 border-2 border-luxury/30 text-primary font-body font-semibold text-sm uppercase tracking-wider transition-all hover:border-secondary hover:text-secondary" data-brand="cb2">
+                    CB2
+                </button>
+                <button onclick="filterPartnerProducts('pottery-barn')" class="partner-brand-btn px-6 py-3 border-2 border-luxury/30 text-primary font-body font-semibold text-sm uppercase tracking-wider transition-all hover:border-secondary hover:text-secondary" data-brand="pottery-barn">
+                    Pottery Barn
+                </button>
+            </div>
+
+            <!-- Partner Products Grid -->
+            <div id="partnerProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Partner products will be dynamically inserted here -->
+            </div>
+
+            <div class="text-center mt-12">
+                <p class="text-luxury/60 font-body text-sm">Products link to official partner websites</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Filter Bar -->
     <section class="py-8 bg-accent/30 border-y luxury-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
