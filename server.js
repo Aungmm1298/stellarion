@@ -117,11 +117,7 @@ app.get('/api/check-status/:taskId', async (req, res) => {
             status: response.data.status,
             progress: response.data.progress,
             modelUrl: response.data.model_urls?.glb,
-            objUrl: response.data.model_urls?.obj,
-            fbxUrl: response.data.model_urls?.fbx,
-            usdz: response.data.model_urls?.usdz,
             thumbnailUrl: response.data.thumbnail_url,
-            allFormats: response.data.model_urls,
             data: response.data
         });
 
