@@ -7,6 +7,8 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🛋️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/loaders/FBXLoader.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -29,9 +31,18 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
     <!-- Three.js for Advanced 3D Rendering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<!-- Three.js core (r128) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- OrbitControls (r128) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<!-- fflate (required for FBXLoader) -->
+<script src="https://cdn.jsdelivr.net/npm/fflate/umd/fflate.min.js"></script>
+
+<!-- FBXLoader (r128) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+ <script src="https://unpkg.com/fflate"></script>
     <style>
         body {
             font-family: 'Lato', sans-serif;
@@ -221,82 +232,82 @@
 <body class="bg-white font-sans">
     <!-- Header -->
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-200/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between py-4">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div class="flex items-center justify-between py-3 sm:py-4">
                 <!-- Logo -->
-                <div class="flex items-center space-x-3 cursor-pointer group">
+                <div class="flex items-center space-x-2 sm:space-x-3 cursor-pointer group">
                     <div class="relative">
-                        <div class="absolute inset-0 bg-gradient-to-br from-secondary to-luxury rounded-xl blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
-                        <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary via-primary to-secondary shadow-xl transform group-hover:scale-110 transition-all duration-300">
-                            <span class="text-2xl text-white font-bold">S</span>
+                        <div class="absolute inset-0 bg-gradient-to-br from-secondary to-luxury rounded-lg sm:rounded-xl blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary via-primary to-secondary shadow-xl transform group-hover:scale-110 transition-all duration-300">
+                            <span class="text-lg sm:text-xl md:text-2xl text-white font-bold">S</span>
                         </div>
                     </div>
                     <div>
-                        <span class="text-2xl font-display font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Stellarion</span>
-                        <div class="text-[10px] text-luxury tracking-[0.2em] uppercase font-body -mt-1">Fine Furniture</div>
+                        <span class="text-lg sm:text-xl md:text-2xl font-display font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Stellarion</span>
+                        <div class="text-[8px] sm:text-[10px] text-luxury tracking-[0.2em] uppercase font-body -mt-1">Fine Furniture</div>
                     </div>
                 </div>
 
                 <!-- Desktop Navigation -->
-                <nav class="hidden md:flex items-center space-x-1">
-                    <a href="#products" class="px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
-                        <i class="fas fa-th-large mr-2 text-primary"></i>Collections
+                <nav class="hidden lg:flex items-center space-x-1 xl:space-x-2">
+                    <a href="#products" class="px-2 xl:px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-xs xl:text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-th-large mr-1 xl:mr-2 text-primary"></i>Collections
                     </a>
-                    <a href="#rooms" class="px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
-                        <i class="fas fa-door-open mr-2 text-primary"></i>Rooms
+                    <a href="#rooms" class="px-2 xl:px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-xs xl:text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-door-open mr-1 xl:mr-2 text-primary"></i>Rooms
                     </a>
-                    <a href="#room-designer"  class="px-4 py-2 rounded-lg text-gray-700 hover:text-secondary hover:bg-secondary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
+                    <a href="#room-designer" onclick="event.preventDefault(); openRoomDesigner();" class="px-4 py-2 rounded-lg text-gray-700 hover:text-secondary hover:bg-secondary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
                         <i class="fas fa-paint-brush mr-2 text-secondary"></i>Room Designer
                     </a>
-                    <a href="#subscription" class="px-4 py-2 rounded-lg text-gray-700 hover:text-secondary hover:bg-secondary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
-                        <i class="fas fa-crown mr-2 text-secondary"></i>Membership
+                    <a href="#subscription" class="px-2 xl:px-4 py-2 rounded-lg text-gray-700 hover:text-secondary hover:bg-secondary/5 font-body font-semibold text-xs xl:text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-crown mr-1 xl:mr-2 text-secondary"></i>Membership
                     </a>
-                    <a href="#deals" class="px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
-                        <i class="fas fa-fire mr-2 text-orange-500"></i>Featured
+                    <a href="#deals" class="px-2 xl:px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-xs xl:text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-fire mr-1 xl:mr-2 text-orange-500"></i>Featured
                     </a>
-                    <a href="#inspiration" class="px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
-                        <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>Inspiration
+                    <a href="#inspiration" class="px-2 xl:px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-xs xl:text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-lightbulb mr-1 xl:mr-2 text-yellow-500"></i>Inspiration
                     </a>
                 </nav>
 
                 <!-- Actions -->
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-1 sm:space-x-2">
                     <!-- Search -->
-                    <div class="hidden lg:flex items-center">
+                    <div class="hidden xl:flex items-center">
                         <div class="relative">
                             <input type="text" id="searchInput" 
                                    placeholder="Search furniture..." 
-                                   class="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:border-primary bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-body text-sm">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                   class="w-48 xl:w-64 pl-9 pr-3 py-2 rounded-full border border-gray-200 focus:border-primary bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-body text-xs xl:text-sm">
+                            <i class="fas fa-search absolute left-3 xl:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                         </div>
                     </div>
 
                     <!-- Wishlist -->
-                    <button id="wishlistBtn" class="relative p-2.5 hover:bg-red-50 rounded-full transition-all group">
-                        <i class="fas fa-heart text-lg text-gray-600 group-hover:text-red-500 transition-colors"></i>
-                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-body shadow-lg">0</span>
+                    <button id="wishlistBtn" class="relative p-1.5 sm:p-2 md:p-2.5 hover:bg-red-50 rounded-full transition-all group">
+                        <i class="fas fa-heart text-base sm:text-lg text-gray-600 group-hover:text-red-500 transition-colors"></i>
+                        <span id="wishlistCount" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center font-body shadow-lg">0</span>
                     </button>
 
                     <!-- Cart -->
-                    <button id="cartBtn" class="relative p-2.5 hover:bg-primary/5 rounded-full transition-all group">
-                        <i class="fas fa-shopping-bag text-lg text-gray-600 group-hover:text-primary transition-colors"></i>
-                        <span id="cartCount" class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-body shadow-lg">0</span>
+                    <button id="cartBtn" class="relative p-1.5 sm:p-2 md:p-2.5 hover:bg-primary/5 rounded-full transition-all group">
+                        <i class="fas fa-shopping-bag text-base sm:text-lg text-gray-600 group-hover:text-primary transition-colors"></i>
+                        <span id="cartCount" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-primary text-white text-[10px] sm:text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center font-body shadow-lg">0</span>
                     </button>
 
                     <!-- Admin 3D Generator -->
-                    <button id="adminBtn" class="p-2.5 hover:bg-secondary/10 rounded-full transition-all group" title="3D Model Generator">
-                        <i class="fas fa-cube text-lg text-gray-600 group-hover:text-secondary transition-colors"></i>
+                    <button id="adminBtn" class="hidden sm:block p-1.5 sm:p-2 md:p-2.5 hover:bg-secondary/10 rounded-full transition-all group" title="3D Model Generator">
+                        <i class="fas fa-cube text-base sm:text-lg text-gray-600 group-hover:text-secondary transition-colors"></i>
                     </button>
 
                     <!-- User -->
-                    <button id="userBtn" class="hidden md:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                        <i class="fas fa-user text-sm"></i>
-                        <span class="font-body font-semibold text-sm">Account</span>
+                    <button id="userBtn" class="hidden lg:flex items-center space-x-2 px-3 xl:px-4 py-2 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-user text-xs xl:text-sm"></i>
+                        <span class="font-body font-semibold text-xs xl:text-sm">Account</span>
                     </button>
 
                     <!-- Mobile Menu Button -->
-                    <button id="mobileMenuBtn" class="md:hidden p-2.5 hover:bg-gray-100 rounded-full transition-all">
-                        <i class="fas fa-bars text-lg text-gray-600"></i>
+                    <button id="mobileMenuBtn" class="lg:hidden p-1.5 sm:p-2 md:p-2.5 hover:bg-gray-100 rounded-full transition-all">
+                        <i class="fas fa-bars text-base sm:text-lg text-gray-600"></i>
                     </button>
                 </div>
             </div>

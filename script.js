@@ -2487,6 +2487,13 @@ const roomTemplates = {
     }
 };
 
+const roomModels = {
+    "living-room": "./image/Rooms/Room1.fbx",
+    "bedroom": "./image/Rooms/Room2.fbx",
+    "kitchen": "./image/Rooms/Room3.fbx",
+    "bathroom": "./image/Rooms/Room4.fbx"
+};
+
 const designerFurnitureLibrary = [
     { id: 'df1', name: 'Modern Sofa', category: 'seating', price: 899, thumbnail: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200' },
     { id: 'df2', name: 'Accent Chair', category: 'seating', price: 399, thumbnail: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=200' },
@@ -2543,99 +2550,103 @@ function closeRoomDesigner() {
 
 function selectRoomTemplate(templateId) {
     currentRoom = roomTemplates[templateId];
+       console.log(templateId)
     if (currentRoom) {
         document.getElementById('currentRoomName').textContent = currentRoom.name;
         openRoomDesigner();
         // Give modal time to render before initializing 3D
         setTimeout(() => {
-            initializeRoom3D();
+            initializeRoom3D(templateId);
         }, 200);
     }
 }
 
-function initializeRoom3D() {
-    const canvas = document.getElementById('roomCanvas');
-    if (!canvas || !currentRoom) {
-        console.error('Canvas or currentRoom not found');
-        return;
-    }
+function initializeRoom3D(templateId) {
+    console.log("Selected template:", templateId);
 
-    // Clear previous scene
-    canvas.innerHTML = '';
+    const canvas = document.getElementById('roomCanvas');
+    if (!canvas) return console.error('Canvas not found');
+
+    // Reset
+    canvas.innerHTML = "";
     roomObjects = [];
 
     try {
-        // Create Three.js scene
+        // --- Scene ---
         roomScene = new THREE.Scene();
         roomScene.background = new THREE.Color(0xf5f0e8);
 
-        // Setup camera
-        const width = canvas.clientWidth;
-        const height = canvas.clientHeight;
-        
-        console.log('Canvas dimensions:', width, 'x', height);
-        
-        if (width === 0 || height === 0) {
-            console.error('Canvas has zero dimensions');
-            canvas.innerHTML = '<div class="absolute inset-0 flex items-center justify-center"><p class="text-red-600 font-body">Error: Canvas not properly sized</p></div>';
-            return;
-        }
-        
-        const aspect = width / height;
-        roomCamera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000);
-        roomCamera.position.set(15, 12, 15);
+        // --- Camera ---
+        const width = canvas.clientWidth || window.innerWidth;
+        const height = canvas.clientHeight || window.innerHeight;
+        roomCamera = new THREE.PerspectiveCamera(60, width / height, 0.1, 2000);
+        roomCamera.position.set(10, 10, 10);
         roomCamera.lookAt(0, 0, 0);
 
-        // Setup renderer
+        // --- Renderer ---
         roomRenderer = new THREE.WebGLRenderer({ antialias: true });
         roomRenderer.setSize(width, height);
         roomRenderer.setPixelRatio(window.devicePixelRatio);
         roomRenderer.shadowMap.enabled = true;
         roomRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        
-        // Style the canvas to fill container
-        roomRenderer.domElement.style.width = '100%';
-        roomRenderer.domElement.style.height = '100%';
-        roomRenderer.domElement.style.display = 'block';
-        
         canvas.appendChild(roomRenderer.domElement);
 
-        // Add orbit controls
+        // --- Controls ---
         roomControls = new THREE.OrbitControls(roomCamera, roomRenderer.domElement);
         roomControls.enableDamping = true;
         roomControls.dampingFactor = 0.05;
         roomControls.minDistance = 5;
         roomControls.maxDistance = 50;
         roomControls.maxPolarAngle = Math.PI / 2 - 0.05;
-        roomControls.target.set(0, 2, 0);
 
-        // Create room environment
-        createRoom3D();
-
-        // Add lights
+        // --- Lights ---
         addRoomLights();
 
-        // Enable drag and drop
+        // --- Load room model ---
+        loadRoomModel(templateId);
+
+        // --- Drag & Drop ---
         setupRoomDragDrop();
 
-        // Handle window resize
+        // --- Window resize ---
         window.addEventListener('resize', onRoomResize);
 
-        // Start animation loop
+        // --- Animate ---
         animateRoom();
 
-        console.log('✅ 3D Room initialized successfully:', currentRoom.name);
     } catch (error) {
-        console.error('❌ Error initializing 3D room:', error);
-        canvas.innerHTML = `
-            <div class="absolute inset-0 flex items-center justify-center bg-red-50">
-                <div class="text-center p-8">
-                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-                    <p class="text-red-600 font-body">Error loading 3D room. Please refresh and try again.</p>
-                </div>
-            </div>
-        `;
+        console.error("Error initializing 3D room:", error);
+        canvas.innerHTML = `<div class='text-red-600'>Error loading 3D room.</div>`;
     }
+}
+
+function loadRoomModel(templateId) {
+    const modelPath = roomModels[templateId];
+    console.log(modelPath);
+    if (!modelPath) return console.warn("No FBX found for template:", templateId);
+
+    const loader = new THREE.FBXLoader();
+    loader.load(
+        modelPath,
+        function (object) {
+            object.scale.set(0.1, 0.1, 0.1); // adjust as needed
+            object.position.set(1, 1, 1);
+
+            object.traverse(child => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
+            roomScene.add(object);
+            console.log("Room model loaded:", modelPath);
+        },
+        undefined,
+        function (error) {
+            console.error("FBX Load Error:", error);
+        }
+    );
 }
 
 function onRoomResize() {
