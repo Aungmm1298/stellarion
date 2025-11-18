@@ -2358,6 +2358,577 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================
+// SMOOTH SCROLL FUNCTIONS
+// ============================================
+function scrollToProducts() {
+    const productsSection = document.getElementById('products');
+    if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function scrollToRooms() {
+    const roomsSection = document.getElementById('rooms');
+    if (roomsSection) {
+        roomsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// ============================================
+// SUBSCRIPTION PLAN FUNCTIONS
+// ============================================
+function selectPlan(planType) {
+    // Check if user is logged in
+    if (!isLoggedIn) {
+        showLoginModal();
+        alert('Please login to subscribe to a plan');
+        return;
+    }
+
+    const plans = {
+        freemium: {
+            name: 'Freemium Plan',
+            price: 0,
+            priceThb: 0,
+            features: ['Augmented Reality (AR) Access', 'Comprehensive Tutorial Guide', 'Advertising Integration', 'Restricted Color Palette', 'No AI Features', 'Free 3D objects Functionality', 'Single-User Editing Constraint']
+        },
+        premium: {
+            name: 'Premium Plan',
+            price: 29,
+            priceThb: 1015,
+            features: ['Augmented Reality (AR) Access', 'Comprehensive Tutorial Guide', 'Ad-Free Experience', 'Comprehensive Color Palette', 'AI-Powered Assistance', '3D Object Scanning Support', 'Collaborative Editing']
+        },
+        enterprise: {
+            name: 'Enterprise Plan',
+            price: 'Custom',
+            priceThb: 'Custom',
+            features: ['All Premium Features', 'Unlimited Team Members', 'White-Label Solutions', 'API Access & Integration', 'Custom Training Sessions', '24/7 Priority Support', 'Service Level Agreement (SLA)', 'Dedicated Infrastructure']
+        }
+    };
+
+    const selectedPlan = plans[planType];
+    
+    // For enterprise plan, show contact message
+    if (planType === 'enterprise') {
+        alert('🏢 Thank you for your interest in our Enterprise Plan!\n\nOur sales team will contact you shortly to discuss custom pricing and implementation.\n\nPlease contact: enterprise@stellarion.com\nOr call: +1 (555) 123-4567');
+        return;
+    }
+
+    // Store subscription in currentUser
+    currentUser.subscription = {
+        plan: planType,
+        planName: selectedPlan.name,
+        price: selectedPlan.price,
+        priceThb: selectedPlan.priceThb,
+        features: selectedPlan.features,
+        startDate: new Date().toISOString(),
+        status: 'active'
+    };
+
+    // Save to localStorage
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+    // Show success message
+    if (planType === 'freemium') {
+        alert(`🎉 Welcome to Stellarion Freemium!\n\nYou now have access to all free features including AR visualization and 3D product previews.\n\nUpgrade anytime to unlock premium features!`);
+    } else {
+        alert(`🎉 Congratulations! You've successfully subscribed to the ${selectedPlan.name}!\n\nYou now have access to all premium features.\n\nThank you for becoming a premium member!`);
+    }
+
+    // Update UI to show subscription status
+    updateUserProfile();
+}
+
+function toggleFAQ(faqNumber) {
+    const faqContent = document.getElementById(`faq-${faqNumber}`);
+    const faqIcon = document.querySelector(`.faq-icon-${faqNumber}`);
+    
+    if (faqContent && faqIcon) {
+        if (faqContent.classList.contains('hidden')) {
+            faqContent.classList.remove('hidden');
+            faqIcon.style.transform = 'rotate(180deg)';
+        } else {
+            faqContent.classList.add('hidden');
+            faqIcon.style.transform = 'rotate(0deg)';
+        }
+    }
+}
+
+// ============================================
+// VIRTUAL ROOM DESIGNER FUNCTIONS
+// ============================================
+let currentRoom = null;
+let roomFurniture = [];
+let selectedItem = null;
+let roomScene = null;
+let roomCamera = null;
+let roomRenderer = null;
+let roomControls = null;
+let roomObjects = [];
+
+const roomTemplates = {
+    'living-room': {
+        name: 'Living Room',
+        dimensions: { width: 20, length: 25, height: 10 },
+        floor: '#f5f0e8',
+        walls: '#ffffff'
+    },
+    'bedroom': {
+        name: 'Bedroom',
+        dimensions: { width: 15, length: 18, height: 9 },
+        floor: '#e8d5c4',
+        walls: '#f8f8f8'
+    },
+    'dining-room': {
+        name: 'Dining Room',
+        dimensions: { width: 16, length: 20, height: 10 },
+        floor: '#d4c4b0',
+        walls: '#fafafa'
+    }
+};
+
+const designerFurnitureLibrary = [
+    { id: 'df1', name: 'Modern Sofa', category: 'seating', price: 899, thumbnail: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200' },
+    { id: 'df2', name: 'Accent Chair', category: 'seating', price: 399, thumbnail: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=200' },
+    { id: 'df3', name: 'Coffee Table', category: 'tables', price: 299, thumbnail: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=200' },
+    { id: 'df4', name: 'Dining Table', category: 'tables', price: 799, thumbnail: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=200' },
+    { id: 'df5', name: 'Bookshelf', category: 'storage', price: 449, thumbnail: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?w=200' },
+    { id: 'df6', name: 'TV Console', category: 'storage', price: 549, thumbnail: 'https://images.unsplash.com/photo-1616627781431-23e8f8619d96?w=200' },
+    { id: 'df7', name: 'Floor Lamp', category: 'lighting', price: 179, thumbnail: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=200' },
+    { id: 'df8', name: 'Table Lamp', category: 'lighting', price: 89, thumbnail: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=200' },
+    { id: 'df9', name: 'Wall Art', category: 'decor', price: 129, thumbnail: 'https://images.unsplash.com/photo-1582042945925-9b71c3c63a0e?w=200' },
+    { id: 'df10', name: 'Plant Pot', category: 'decor', price: 59, thumbnail: 'https://images.unsplash.com/photo-1591958911259-bee2173bdccc?w=200' }
+];
+
+function openRoomDesigner() {
+    const modal = document.getElementById('roomDesignerModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        loadDesignerFurniture('all');
+        
+        // If a room is already selected, initialize it
+        if (currentRoom) {
+            setTimeout(() => {
+                initializeRoom3D();
+            }, 200);
+        }
+    }
+}
+
+function closeRoomDesigner() {
+    const modal = document.getElementById('roomDesignerModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+        
+        // Clean up Three.js resources
+        window.removeEventListener('resize', onRoomResize);
+        
+        if (roomRenderer) {
+            roomRenderer.dispose();
+            roomRenderer.domElement?.remove();
+            roomRenderer = null;
+        }
+        if (roomScene) {
+            roomScene.clear();
+            roomScene = null;
+        }
+        roomCamera = null;
+        roomControls = null;
+        roomObjects = [];
+        currentRoom = null;
+    }
+}
+
+function selectRoomTemplate(templateId) {
+    currentRoom = roomTemplates[templateId];
+    if (currentRoom) {
+        document.getElementById('currentRoomName').textContent = currentRoom.name;
+        openRoomDesigner();
+        // Give modal time to render before initializing 3D
+        setTimeout(() => {
+            initializeRoom3D();
+        }, 200);
+    }
+}
+
+function initializeRoom3D() {
+    const canvas = document.getElementById('roomCanvas');
+    if (!canvas || !currentRoom) {
+        console.error('Canvas or currentRoom not found');
+        return;
+    }
+
+    // Clear previous scene
+    canvas.innerHTML = '';
+    roomObjects = [];
+
+    try {
+        // Create Three.js scene
+        roomScene = new THREE.Scene();
+        roomScene.background = new THREE.Color(0xf5f0e8);
+
+        // Setup camera
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        
+        console.log('Canvas dimensions:', width, 'x', height);
+        
+        if (width === 0 || height === 0) {
+            console.error('Canvas has zero dimensions');
+            canvas.innerHTML = '<div class="absolute inset-0 flex items-center justify-center"><p class="text-red-600 font-body">Error: Canvas not properly sized</p></div>';
+            return;
+        }
+        
+        const aspect = width / height;
+        roomCamera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000);
+        roomCamera.position.set(15, 12, 15);
+        roomCamera.lookAt(0, 0, 0);
+
+        // Setup renderer
+        roomRenderer = new THREE.WebGLRenderer({ antialias: true });
+        roomRenderer.setSize(width, height);
+        roomRenderer.setPixelRatio(window.devicePixelRatio);
+        roomRenderer.shadowMap.enabled = true;
+        roomRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        // Style the canvas to fill container
+        roomRenderer.domElement.style.width = '100%';
+        roomRenderer.domElement.style.height = '100%';
+        roomRenderer.domElement.style.display = 'block';
+        
+        canvas.appendChild(roomRenderer.domElement);
+
+        // Add orbit controls
+        roomControls = new THREE.OrbitControls(roomCamera, roomRenderer.domElement);
+        roomControls.enableDamping = true;
+        roomControls.dampingFactor = 0.05;
+        roomControls.minDistance = 5;
+        roomControls.maxDistance = 50;
+        roomControls.maxPolarAngle = Math.PI / 2 - 0.05;
+        roomControls.target.set(0, 2, 0);
+
+        // Create room environment
+        createRoom3D();
+
+        // Add lights
+        addRoomLights();
+
+        // Enable drag and drop
+        setupRoomDragDrop();
+
+        // Handle window resize
+        window.addEventListener('resize', onRoomResize);
+
+        // Start animation loop
+        animateRoom();
+
+        console.log('✅ 3D Room initialized successfully:', currentRoom.name);
+    } catch (error) {
+        console.error('❌ Error initializing 3D room:', error);
+        canvas.innerHTML = `
+            <div class="absolute inset-0 flex items-center justify-center bg-red-50">
+                <div class="text-center p-8">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <p class="text-red-600 font-body">Error loading 3D room. Please refresh and try again.</p>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function onRoomResize() {
+    if (!roomCamera || !roomRenderer || !document.getElementById('roomCanvas')) return;
+    
+    const canvas = document.getElementById('roomCanvas');
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    
+    roomCamera.aspect = width / height;
+    roomCamera.updateProjectionMatrix();
+    roomRenderer.setSize(width, height);
+}
+
+function createRoom3D() {
+    const { width, length, height } = currentRoom.dimensions;
+
+    // Floor
+    const floorGeometry = new THREE.PlaneGeometry(width, length);
+    const floorMaterial = new THREE.MeshStandardMaterial({ 
+        color: new THREE.Color(currentRoom.floor),
+        roughness: 0.8,
+        metalness: 0.2
+    });
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    roomScene.add(floor);
+
+    // Walls
+    const wallMaterial = new THREE.MeshStandardMaterial({ 
+        color: new THREE.Color(currentRoom.walls),
+        side: THREE.DoubleSide,
+        roughness: 0.9
+    });
+
+    // Back wall
+    const backWall = new THREE.Mesh(
+        new THREE.PlaneGeometry(width, height),
+        wallMaterial
+    );
+    backWall.position.set(0, height/2, -length/2);
+    backWall.receiveShadow = true;
+    roomScene.add(backWall);
+
+    // Left wall
+    const leftWall = new THREE.Mesh(
+        new THREE.PlaneGeometry(length, height),
+        wallMaterial
+    );
+    leftWall.position.set(-width/2, height/2, 0);
+    leftWall.rotation.y = Math.PI / 2;
+    leftWall.receiveShadow = true;
+    roomScene.add(leftWall);
+
+    // Right wall
+    const rightWall = new THREE.Mesh(
+        new THREE.PlaneGeometry(length, height),
+        wallMaterial
+    );
+    rightWall.position.set(width/2, height/2, 0);
+    rightWall.rotation.y = -Math.PI / 2;
+    rightWall.receiveShadow = true;
+    roomScene.add(rightWall);
+
+    // Add subtle grid helper
+    const gridHelper = new THREE.GridHelper(Math.max(width, length), 20, 0xd4a960, 0xe8dcc8);
+    gridHelper.material.opacity = 0.3;
+    gridHelper.material.transparent = true;
+    roomScene.add(gridHelper);
+}
+
+function addRoomLights() {
+    // Soft ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    roomScene.add(ambientLight);
+
+    // Main directional light (soft sunlight)
+    const sunLight = new THREE.DirectionalLight(0xfff8e7, 0.5);
+    sunLight.position.set(10, 20, 10);
+    sunLight.castShadow = true;
+    sunLight.shadow.camera.left = -20;
+    sunLight.shadow.camera.right = 20;
+    sunLight.shadow.camera.top = 20;
+    sunLight.shadow.camera.bottom = -20;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    roomScene.add(sunLight);
+
+    // Soft fill light
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.2);
+    fillLight.position.set(-10, 10, -10);
+    roomScene.add(fillLight);
+
+    // Subtle point light for depth
+    const pointLight = new THREE.PointLight(0xffe4c4, 0.3, 30);
+    pointLight.position.set(0, 8, 0);
+    roomScene.add(pointLight);
+}
+
+function setupRoomDragDrop() {
+    const canvas = document.getElementById('roomCanvas');
+    if (!canvas) return;
+
+    canvas.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    });
+
+    canvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const furnitureId = e.dataTransfer.getData('furnitureId');
+        if (furnitureId) {
+            addFurnitureToRoom(furnitureId, e.clientX, e.clientY);
+        }
+    });
+}
+
+function addFurnitureToRoom(furnitureId, clientX, clientY) {
+    const furniture = designerFurnitureLibrary.find(f => f.id === furnitureId);
+    if (!furniture) return;
+
+    // Get 3D position from screen coordinates
+    const canvas = document.getElementById('roomCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    const y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+    // Raycast to find floor position
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(new THREE.Vector2(x, y), roomCamera);
+    
+    const floor = roomScene.children.find(obj => obj.geometry?.type === 'PlaneGeometry' && obj.rotation.x < 0);
+    if (!floor) return;
+
+    const intersects = raycaster.intersectObject(floor);
+    if (intersects.length === 0) return;
+
+    const position = intersects[0].point;
+
+    // Create furniture placeholder (box for now)
+    let furnitureObj;
+    const material = new THREE.MeshStandardMaterial({ 
+        color: Math.random() * 0xffffff,
+        roughness: 0.6,
+        metalness: 0.3
+    });
+
+    // Different sizes based on category
+    switch(furniture.category) {
+        case 'seating':
+            furnitureObj = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 2), material);
+            break;
+        case 'tables':
+            furnitureObj = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 2), material);
+            break;
+        case 'storage':
+            furnitureObj = new THREE.Mesh(new THREE.BoxGeometry(2, 4, 1), material);
+            break;
+        case 'lighting':
+            furnitureObj = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 4), material);
+            break;
+        case 'decor':
+            furnitureObj = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1, 0.5), material);
+            break;
+        default:
+            furnitureObj = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+    }
+
+    furnitureObj.position.copy(position);
+    furnitureObj.position.y = furnitureObj.geometry.parameters.height / 2 || 0.5;
+    furnitureObj.castShadow = true;
+    furnitureObj.receiveShadow = true;
+    furnitureObj.userData = { furniture, id: Date.now() };
+
+    roomScene.add(furnitureObj);
+    roomObjects.push(furnitureObj);
+    roomFurniture.push({ furniture, position: furnitureObj.position.toArray(), rotation: furnitureObj.rotation.toArray() });
+
+    console.log(`Added ${furniture.name} to room at`, position);
+}
+
+function animateRoom() {
+    if (!roomRenderer || !roomScene || !roomCamera) {
+        return; // Stop animation if resources are cleaned up
+    }
+
+    requestAnimationFrame(animateRoom);
+    
+    if (roomControls) {
+        roomControls.update();
+    }
+
+    try {
+        roomRenderer.render(roomScene, roomCamera);
+    } catch (error) {
+        console.error('Error rendering room:', error);
+    }
+}
+
+function initializeRoom() {
+    // Legacy fallback - now handled by initializeRoom3D
+    initializeRoom3D();
+}
+
+function loadDesignerFurniture(category) {
+    const list = document.getElementById('designerFurnitureList');
+    if (!list) return;
+
+    const filtered = category === 'all' 
+        ? designerFurnitureLibrary 
+        : designerFurnitureLibrary.filter(item => item.category === category);
+
+    list.innerHTML = filtered.map(item => `
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all cursor-move" draggable="true" data-furniture-id="${item.id}">
+            <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-32 object-cover">
+            <div class="p-3">
+                <h5 class="font-display font-bold text-primary text-sm mb-1">${item.name}</h5>
+                <p class="font-body text-secondary text-xs font-semibold">$${item.price}</p>
+            </div>
+        </div>
+    `).join('');
+
+    // Add drag listeners
+    list.querySelectorAll('[draggable="true"]').forEach(el => {
+        el.addEventListener('dragstart', handleDragStart);
+    });
+}
+
+function filterDesignerFurniture(category) {
+    // Update active button
+    document.querySelectorAll('#roomDesignerModal button[onclick^="filterDesignerFurniture"]').forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-white');
+        btn.classList.add('hover:bg-gray-200', 'text-gray-700');
+    });
+    event.target.classList.add('bg-primary', 'text-white');
+    event.target.classList.remove('hover:bg-gray-200', 'text-gray-700');
+
+    loadDesignerFurniture(category);
+}
+
+function handleDragStart(e) {
+    e.dataTransfer.setData('furnitureId', e.target.dataset.furnitureId);
+}
+
+function changeRoomView(view) {
+    // Update active button
+    document.querySelectorAll('#roomDesignerModal button[onclick^="changeRoomView"]').forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-white');
+        btn.classList.add('bg-gray-100', 'hover:bg-gray-200');
+    });
+    event.target.classList.add('bg-primary', 'text-white');
+    event.target.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+
+    alert(`📐 Switched to ${view === 'top' ? 'Top' : '3D'} view!\n\nThis feature would show different camera angles in a full implementation.`);
+}
+
+function clearRoom() {
+    if (confirm('🗑️ Are you sure you want to clear all furniture from the room?')) {
+        // Remove all furniture objects from scene
+        roomObjects.forEach(obj => {
+            if (roomScene) {
+                roomScene.remove(obj);
+            }
+        });
+        roomObjects = [];
+        roomFurniture = [];
+        selectedItem = null;
+        alert('✨ Room cleared successfully!');
+    }
+}
+
+function saveRoomDesign() {
+    if (!currentRoom) {
+        alert('⚠️ Please select a room template first!');
+        return;
+    }
+
+    const design = {
+        room: currentRoom.name,
+        furniture: roomFurniture,
+        date: new Date().toISOString()
+    };
+
+    // Save to localStorage
+    const savedDesigns = JSON.parse(localStorage.getItem('roomDesigns') || '[]');
+    savedDesigns.push(design);
+    localStorage.setItem('roomDesigns', JSON.stringify(savedDesigns));
+
+    alert(`💾 Design saved successfully!\n\nRoom: ${currentRoom.name}\nFurniture items: ${roomFurniture.length}\n\nYou can access your saved designs anytime from your account.`);
+}
+
+// ============================================
 // WINDOW GLOBAL FUNCTIONS
 // ============================================
 // Make functions globally available for onclick handlers
@@ -2377,3 +2948,14 @@ window.handleRegister = handleRegister;
 window.handleLogout = handleLogout;
 window.showUserProfile = showUserProfile;
 window.filterPartnerProducts = filterPartnerProducts;
+window.scrollToProducts = scrollToProducts;
+window.scrollToRooms = scrollToRooms;
+window.selectPlan = selectPlan;
+window.toggleFAQ = toggleFAQ;
+window.openRoomDesigner = openRoomDesigner;
+window.closeRoomDesigner = closeRoomDesigner;
+window.selectRoomTemplate = selectRoomTemplate;
+window.filterDesignerFurniture = filterDesignerFurniture;
+window.changeRoomView = changeRoomView;
+window.clearRoom = clearRoom;
+window.saveRoomDesign = saveRoomDesign;

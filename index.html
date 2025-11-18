@@ -220,77 +220,83 @@
 </head>
 <body class="bg-white font-sans">
     <!-- Header -->
-    <header class="sticky top-0 z-50 glass-effect shadow-sm">
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-200/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between py-5">
+            <div class="flex items-center justify-between py-4">
                 <!-- Logo -->
-                <div class="flex items-center space-x-4 cursor-pointer group">
-                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary shadow-lg transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-300">
-                        <span class="text-2xl text-white font-bold">S</span>
+                <div class="flex items-center space-x-3 cursor-pointer group">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-secondary to-luxury rounded-xl blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary via-primary to-secondary shadow-xl transform group-hover:scale-110 transition-all duration-300">
+                            <span class="text-2xl text-white font-bold">S</span>
+                        </div>
                     </div>
                     <div>
-                        <span class="text-3xl font-bold text-primary tracking-tight group-hover:text-secondary transition-colors">Stellarion</span>
-                        <div class="text-xs text-luxury tracking-widest uppercase font-body">Fine Furniture</div>
+                        <span class="text-2xl font-display font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Stellarion</span>
+                        <div class="text-[10px] text-luxury tracking-[0.2em] uppercase font-body -mt-1">Fine Furniture</div>
                     </div>
                 </div>
 
                 <!-- Desktop Navigation -->
-                <nav class="hidden md:flex items-center space-x-10">
-                    <a href="#products" class="text-primary hover:text-secondary font-body font-semibold text-sm uppercase tracking-wider transition-colors relative group">
-                        Collections
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-500"></span>
+                <nav class="hidden md:flex items-center space-x-1">
+                    <a href="#products" class="px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-th-large mr-2 text-primary"></i>Collections
                     </a>
-                    <a href="#rooms" class="text-primary hover:text-secondary font-body font-semibold text-sm uppercase tracking-wider transition-colors relative group">
-                        Rooms
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-500"></span>
+                    <a href="#rooms" class="px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-door-open mr-2 text-primary"></i>Rooms
                     </a>
-                    <a href="#deals" class="text-primary hover:text-secondary font-body font-semibold text-sm uppercase tracking-wider transition-colors relative group">
-                        Featured
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-500"></span>
+                    <a href="#room-designer" onclick="event.preventDefault(); openRoomDesigner();" class="px-4 py-2 rounded-lg text-gray-700 hover:text-secondary hover:bg-secondary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-paint-brush mr-2 text-secondary"></i>Room Designer
                     </a>
-                    <a href="#inspiration" class="text-primary hover:text-secondary font-body font-semibold text-sm uppercase tracking-wider transition-colors relative group">
-                        Inspiration
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-500"></span>
+                    <a href="#subscription" class="px-4 py-2 rounded-lg text-gray-700 hover:text-secondary hover:bg-secondary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-crown mr-2 text-secondary"></i>Membership
+                    </a>
+                    <a href="#deals" class="px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-fire mr-2 text-orange-500"></i>Featured
+                    </a>
+                    <a href="#inspiration" class="px-4 py-2 rounded-lg text-gray-700 hover:text-primary hover:bg-primary/5 font-body font-semibold text-sm transition-all duration-300 relative group">
+                        <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>Inspiration
                     </a>
                 </nav>
 
                 <!-- Actions -->
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
                     <!-- Search -->
                     <div class="hidden lg:flex items-center">
                         <div class="relative">
                             <input type="text" id="searchInput" 
-                                   placeholder="Search our collection..." 
-                                   class="w-72 pl-10 pr-4 py-2.5 rounded-none border-b-2 border-accent focus:border-secondary bg-transparent focus:outline-none transition-all font-body text-sm">
-                            <i class="fas fa-search absolute left-0 top-1/2 -translate-y-1/2 text-luxury"></i>
+                                   placeholder="Search furniture..." 
+                                   class="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:border-primary bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-body text-sm">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                         </div>
                     </div>
 
                     <!-- Wishlist -->
-                    <button id="wishlistBtn" class="relative p-3 hover:bg-accent/30 rounded-none transition-all group">
-                        <i class="fas fa-heart text-lg text-primary group-hover:text-secondary transition-colors"></i>
-                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-secondary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-body">0</span>
+                    <button id="wishlistBtn" class="relative p-2.5 hover:bg-red-50 rounded-full transition-all group">
+                        <i class="fas fa-heart text-lg text-gray-600 group-hover:text-red-500 transition-colors"></i>
+                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-body shadow-lg">0</span>
                     </button>
 
                     <!-- Cart -->
-                    <button id="cartBtn" class="relative p-3 hover:bg-accent/30 rounded-none transition-all group">
-                        <i class="fas fa-shopping-bag text-lg text-primary group-hover:text-secondary transition-colors"></i>
-                        <span id="cartCount" class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-body">0</span>
+                    <button id="cartBtn" class="relative p-2.5 hover:bg-primary/5 rounded-full transition-all group">
+                        <i class="fas fa-shopping-bag text-lg text-gray-600 group-hover:text-primary transition-colors"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-body shadow-lg">0</span>
                     </button>
 
                     <!-- Admin 3D Generator -->
-                    <button id="adminBtn" class="p-3 hover:bg-accent/30 rounded-none transition-all" title="3D Model Generator">
-                        <i class="fas fa-cube text-lg text-primary"></i>
+                    <button id="adminBtn" class="p-2.5 hover:bg-secondary/10 rounded-full transition-all group" title="3D Model Generator">
+                        <i class="fas fa-cube text-lg text-gray-600 group-hover:text-secondary transition-colors"></i>
                     </button>
 
                     <!-- User -->
-                    <button id="userBtn" class="hidden md:flex p-3 hover:bg-accent/30 rounded-none transition-all">
-                        <i class="fas fa-user text-lg text-primary"></i>
+                    <button id="userBtn" class="hidden md:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-user text-sm"></i>
+                        <span class="font-body font-semibold text-sm">Account</span>
                     </button>
 
                     <!-- Mobile Menu Button -->
-                    <button id="mobileMenuBtn" class="md:hidden p-3 hover:bg-accent/30">
-                        <i class="fas fa-bars text-lg text-primary"></i>
+                    <button id="mobileMenuBtn" class="md:hidden p-2.5 hover:bg-gray-100 rounded-full transition-all">
+                        <i class="fas fa-bars text-lg text-gray-600"></i>
                     </button>
                 </div>
             </div>
@@ -330,10 +336,10 @@
                         Discover handcrafted furniture that transforms spaces into sophisticated sanctuaries. Every piece tells a story of craftsmanship and refined taste.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-6">
-                        <button class="btn-primary bg-white hover:bg-white/90 text-primary font-body font-bold py-5 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-white/30 uppercase tracking-wider text-sm">
+                        <button onclick="scrollToProducts()" class="btn-primary bg-white hover:bg-white/90 text-primary font-body font-bold py-5 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-white/30 uppercase tracking-wider text-sm">
                             <i class="fas fa-arrow-right mr-3"></i>Explore Collection
                         </button>
-                        <button class="bg-white/10 backdrop-blur-sm border-2 border-white hover:bg-white text-white hover:text-primary font-body font-bold py-5 px-12 rounded-full transition-all duration-300 uppercase tracking-wider text-sm">
+                        <button onclick="scrollToRooms()" class="bg-white/10 backdrop-blur-sm border-2 border-white hover:bg-white text-white hover:text-primary font-body font-bold py-5 px-12 rounded-full transition-all duration-300 uppercase tracking-wider text-sm">
                             <i class="fas fa-book-open mr-3"></i>View Catalog
                         </button>
                     </div>
@@ -650,6 +656,479 @@
             </div>
         </div>
     </section>
+
+    <!-- Subscription Plans Section -->
+    <section id="subscription" class="py-32 relative overflow-hidden" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);">
+        <!-- Animated Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 left-0 w-full h-full" style="background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.2) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(232,184,109,0.2) 0%, transparent 50%);"></div>
+        </div>
+        <div class="absolute top-10 left-10 w-72 h-72 bg-secondary/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-luxury/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center justify-center mb-6 px-8 py-3 bg-gradient-to-r from-secondary/20 via-luxury/20 to-secondary/20 backdrop-blur-sm rounded-full border border-secondary/30">
+                    <i class="fas fa-crown text-secondary mr-3 text-xl"></i>
+                    <span class="text-white uppercase tracking-[0.4em] text-sm font-bold font-body">Premium Membership</span>
+                </div>
+                <h2 class="text-6xl md:text-7xl font-display font-bold text-white mb-6 drop-shadow-2xl">
+                    Choose Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary via-luxury to-secondary">Plan</span>
+                </h2>
+                <p class="text-xl text-white/80 max-w-3xl mx-auto font-body leading-relaxed">
+                    Elevate your furniture design experience with powerful 3D visualization and premium features
+                </p>
+            </div>
+
+            <!-- Pricing Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+                <!-- Freemium Plan -->
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden transform hover:-translate-y-3 transition-all duration-500 relative group border border-white/20">
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <!-- Card Header -->
+                    <div class="relative p-8 pb-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-cube text-white text-2xl"></i>
+                            </div>
+                            <span class="px-4 py-1.5 bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-full">Free</span>
+                        </div>
+                        <h3 class="text-3xl font-display font-bold text-primary mb-2">Freemium</h3>
+                        <p class="text-gray-500 font-body text-sm">Perfect for beginners</p>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="relative p-8">
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>Augmented Reality (AR) Access</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>Comprehensive Tutorial Guide</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-500">
+                                <div class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-times text-gray-400 text-xs"></i>
+                                </div>
+                                <span>Advertising Integration</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-500">
+                                <div class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-times text-gray-400 text-xs"></i>
+                                </div>
+                                <span>Restricted Color Palette</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-500">
+                                <div class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-times text-gray-400 text-xs"></i>
+                                </div>
+                                <span>No AI Features</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>Free 3D objects Functionality</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-500">
+                                <div class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-times text-gray-400 text-xs"></i>
+                                </div>
+                                <span>Single-User Editing Constraint</span>
+                            </li>
+                        </ul>
+                        <button onclick="selectPlan('freemium')" class="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-body font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            Get Started Free
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Premium Plan -->
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden transform hover:-translate-y-3 transition-all duration-500 relative group border-2 border-secondary scale-105">
+                    <!-- Popular Ribbon -->
+                    <div class="absolute -top-0 -right-0 w-40 h-40 overflow-hidden">
+                        <div class="absolute top-6 right-[-35px] w-48 py-2 bg-gradient-to-r from-secondary via-luxury to-secondary text-white text-center font-bold text-xs uppercase tracking-wider shadow-lg transform rotate-45">
+                            <i class="fas fa-star mr-1"></i>Popular
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <!-- Card Header -->
+                    <div class="relative p-8 pb-6 border-b border-secondary/20 bg-gradient-to-br from-secondary/5 to-transparent">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-secondary to-luxury flex items-center justify-center shadow-lg">
+                                <i class="fas fa-crown text-white text-2xl"></i>
+                            </div>
+                            <span class="px-4 py-1.5 bg-secondary/20 text-secondary text-xs font-bold uppercase tracking-wider rounded-full border border-secondary/30">Best Value</span>
+                        </div>
+                        <h3 class="text-3xl font-display font-bold text-primary mb-2">Premium</h3>
+                        <p class="text-gray-600 font-body text-sm">Most popular choice</p>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="relative p-8">
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-secondary to-luxury flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 shadow-sm">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <span class="font-semibold">Augmented Reality (AR) Access</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-secondary to-luxury flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 shadow-sm">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <span class="font-semibold">Comprehensive Tutorial Guide</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-secondary to-luxury flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 shadow-sm">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <span class="font-semibold">Ad-Free Experience</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-secondary to-luxury flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 shadow-sm">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <span class="font-semibold">Comprehensive Color Palette</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-secondary to-luxury flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 shadow-sm">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <span class="font-semibold">AI-Powered Assistance</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-secondary to-luxury flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 shadow-sm">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <span class="font-semibold">3D Object Scanning Support</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-secondary to-luxury flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 shadow-sm">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <span class="font-semibold">Collaborative Editing</span>
+                            </li>
+                        </ul>
+                        <button onclick="selectPlan('premium')" class="w-full bg-gradient-to-r from-secondary via-luxury to-secondary hover:from-luxury hover:to-secondary text-white font-body font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl">
+                            Choose Premium
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden transform hover:-translate-y-3 transition-all duration-500 relative group border border-white/20">
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <!-- Card Header -->
+                    <div class="relative p-8 pb-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-briefcase text-white text-2xl"></i>
+                            </div>
+                            <span class="px-4 py-1.5 bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider rounded-full">Custom</span>
+                        </div>
+                        <h3 class="text-3xl font-display font-bold text-primary mb-2">Enterprise</h3>
+                        <p class="text-gray-500 font-body text-sm">For large organizations</p>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="relative p-8">
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>All Premium Features</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>Unlimited Team Members</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>White-Label Solutions</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>API Access & Integration</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>Custom Training Sessions</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>24/7 Priority Support</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>Service Level Agreement (SLA)</span>
+                            </li>
+                            <li class="flex items-start font-body text-gray-700">
+                                <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-xs"></i>
+                                </div>
+                                <span>Dedicated Infrastructure</span>
+                            </li>
+                        </ul>
+                        <button onclick="selectPlan('enterprise')" class="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white font-body font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            Contact Sales
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Virtual Room Designer Section -->
+    <section id="room-designer" class="py-32 bg-gradient-to-br from-accent via-white to-accent relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-20">
+                <div class="inline-block mb-6">
+                    <span class="bg-gradient-to-r from-primary to-secondary text-white uppercase tracking-[0.3em] text-xs font-bold px-6 py-2 rounded-full font-body shadow-lg">
+                        <i class="fas fa-magic mr-2"></i>Virtual Designer
+                    </span>
+                </div>
+                <h2 class="text-5xl md:text-6xl font-display font-bold text-primary mb-6">
+                    Design Your Dream Room
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto font-body leading-relaxed">
+                    Try our 3D furniture in virtual room templates before making your purchase
+                </p>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="text-center mb-16">
+                <button onclick="openRoomDesigner()" class="bg-gradient-to-r from-secondary via-luxury to-secondary hover:from-luxury hover:to-secondary text-white font-body font-bold py-5 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl inline-flex items-center space-x-3">
+                    <i class="fas fa-paint-brush text-2xl"></i>
+                    <span class="text-lg">Start Designing Now</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Sample Room Templates Preview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('living-room')">
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800" alt="Living Room" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-6 left-6 text-white">
+                            <h3 class="text-2xl font-display font-bold mb-2">Living Room</h3>
+                            <p class="font-body text-sm text-white/80">Modern & Spacious</p>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                            <i class="fas fa-couch text-white mr-2"></i>
+                            <span class="text-white text-xs font-bold">15 Items</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('bedroom')">
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800" alt="Bedroom" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-6 left-6 text-white">
+                            <h3 class="text-2xl font-display font-bold mb-2">Bedroom</h3>
+                            <p class="font-body text-sm text-white/80">Cozy & Comfortable</p>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                            <i class="fas fa-bed text-white mr-2"></i>
+                            <span class="text-white text-xs font-bold">12 Items</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('dining-room')">
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800" alt="Dining Room" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-6 left-6 text-white">
+                            <h3 class="text-2xl font-display font-bold mb-2">Dining Room</h3>
+                            <p class="font-body text-sm text-white/80">Elegant & Inviting</p>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                            <i class="fas fa-utensils text-white mr-2"></i>
+                            <span class="text-white text-xs font-bold">10 Items</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                <div class="text-center p-6 bg-white rounded-xl shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-cube text-white text-2xl"></i>
+                    </div>
+                    <h4 class="font-display font-bold text-primary mb-2">3D Visualization</h4>
+                    <p class="font-body text-sm text-gray-600">View furniture in realistic 3D</p>
+                </div>
+
+                <div class="text-center p-6 bg-white rounded-xl shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-secondary to-luxury rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-arrows-alt text-white text-2xl"></i>
+                    </div>
+                    <h4 class="font-display font-bold text-primary mb-2">Drag & Drop</h4>
+                    <p class="font-body text-sm text-gray-600">Easy furniture placement</p>
+                </div>
+
+                <div class="text-center p-6 bg-white rounded-xl shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-luxury to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-palette text-white text-2xl"></i>
+                    </div>
+                    <h4 class="font-display font-bold text-primary mb-2">Customize Colors</h4>
+                    <p class="font-body text-sm text-gray-600">Change materials & colors</p>
+                </div>
+
+                <div class="text-center p-6 bg-white rounded-xl shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-primary to-luxury rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-save text-white text-2xl"></i>
+                    </div>
+                    <h4 class="font-display font-bold text-primary mb-2">Save Designs</h4>
+                    <p class="font-body text-sm text-gray-600">Keep your favorite layouts</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Room Designer Modal -->
+    <div id="roomDesignerModal" class="hidden fixed inset-0 z-50 overflow-hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeRoomDesigner()"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative h-full flex flex-col bg-white">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-paint-brush text-2xl"></i>
+                    <div>
+                        <h3 class="text-2xl font-display font-bold">Virtual Room Designer</h3>
+                        <p class="text-sm text-white/80 font-body">Design your perfect space</p>
+                    </div>
+                </div>
+                <button onclick="closeRoomDesigner()" class="p-2 hover:bg-white/20 rounded-full transition-all">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex overflow-hidden">
+                <!-- Sidebar - Furniture Library -->
+                <div class="w-80 bg-gray-50 border-r border-gray-200 overflow-y-auto">
+                    <div class="p-6">
+                        <h4 class="text-lg font-display font-bold text-primary mb-4">Furniture Library</h4>
+                        
+                        <!-- Categories -->
+                        <div class="space-y-2 mb-6">
+                            <button onclick="filterDesignerFurniture('all')" class="w-full text-left px-4 py-2 rounded-lg bg-primary text-white font-body text-sm font-semibold">
+                                <i class="fas fa-th-large mr-2"></i>All Items
+                            </button>
+                            <button onclick="filterDesignerFurniture('seating')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 font-body text-sm text-gray-700">
+                                <i class="fas fa-couch mr-2"></i>Seating
+                            </button>
+                            <button onclick="filterDesignerFurniture('tables')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 font-body text-sm text-gray-700">
+                                <i class="fas fa-table mr-2"></i>Tables
+                            </button>
+                            <button onclick="filterDesignerFurniture('storage')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 font-body text-sm text-gray-700">
+                                <i class="fas fa-box mr-2"></i>Storage
+                            </button>
+                            <button onclick="filterDesignerFurniture('lighting')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 font-body text-sm text-gray-700">
+                                <i class="fas fa-lightbulb mr-2"></i>Lighting
+                            </button>
+                            <button onclick="filterDesignerFurniture('decor')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 font-body text-sm text-gray-700">
+                                <i class="fas fa-leaf mr-2"></i>Decor
+                            </button>
+                        </div>
+
+                        <!-- Furniture Items -->
+                        <div id="designerFurnitureList" class="space-y-3">
+                            <!-- Items will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Area -->
+                <div class="flex-1 flex flex-col bg-gray-100">
+                    <!-- Toolbar -->
+                    <div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeRoomView('top')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-body text-sm font-semibold transition-all">
+                                <i class="fas fa-border-all mr-2"></i>Top View
+                            </button>
+                            <button onclick="changeRoomView('3d')" class="px-4 py-2 bg-primary text-white rounded-lg font-body text-sm font-semibold">
+                                <i class="fas fa-cube mr-2"></i>3D View
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="clearRoom()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-body text-sm font-semibold transition-all">
+                                <i class="fas fa-trash mr-2"></i>Clear Room
+                            </button>
+                            <button onclick="saveRoomDesign()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-body text-sm font-semibold transition-all">
+                                <i class="fas fa-save mr-2"></i>Save Design
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3D Canvas -->
+                    <div class="flex-1 relative" id="roomCanvas">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-cube text-6xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-600 font-body text-lg">Select a room template to start designing</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="bg-white border-t border-gray-200 px-6 py-3">
+                        <div class="flex items-center justify-between text-sm text-gray-600 font-body">
+                            <div class="flex items-center space-x-6">
+                                <span><i class="fas fa-mouse text-primary mr-2"></i>Drag to place furniture</span>
+                                <span><i class="fas fa-sync text-primary mr-2"></i>Right-click to rotate</span>
+                                <span><i class="fas fa-search-plus text-primary mr-2"></i>Scroll to zoom</span>
+                            </div>
+                            <span class="text-secondary font-semibold">Room: <span id="currentRoomName">Not Selected</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Properties Panel -->
+                <div class="w-64 bg-gray-50 border-l border-gray-200 overflow-y-auto">
+                    <div class="p-6">
+                        <h4 class="text-lg font-display font-bold text-primary mb-4">Properties</h4>
+                        <div id="itemProperties" class="text-center py-12">
+                            <i class="fas fa-hand-pointer text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-500 font-body text-sm">Select an item to view properties</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-primary text-white py-20">
