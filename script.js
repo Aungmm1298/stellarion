@@ -2124,6 +2124,240 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// PARTNER BRANDS PRODUCTS
+// ============================================
+const partnerProducts = [
+    // IKEA Products
+    {
+        id: 'partner-1',
+        name: 'KIVIK Sofa',
+        price: 449,
+        category: 'Living Room',
+        brand: 'ikea',
+        brandName: 'IKEA',
+        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop',
+        description: 'Spacious sofa with deep seat cushions and soft comfort',
+        rating: 4.5,
+        reviews: 1247,
+        url: 'https://www.ikea.com'
+    },
+    {
+        id: 'partner-2',
+        name: 'HEMNES Bookcase',
+        price: 189,
+        category: 'Storage',
+        brand: 'ikea',
+        brandName: 'IKEA',
+        image: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?w=800&h=600&fit=crop',
+        description: 'Solid wood bookcase with adjustable shelves',
+        rating: 4.6,
+        reviews: 856,
+        url: 'https://www.ikea.com'
+    },
+    {
+        id: 'partner-3',
+        name: 'MALM Bed Frame',
+        price: 229,
+        category: 'Bedroom',
+        brand: 'ikea',
+        brandName: 'IKEA',
+        image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop',
+        description: 'Modern bed frame with adjustable bed sides',
+        rating: 4.7,
+        reviews: 2134,
+        url: 'https://www.ikea.com'
+    },
+    // Wayfair Products
+    {
+        id: 'partner-4',
+        name: 'Madison Sectional',
+        price: 1299,
+        category: 'Living Room',
+        brand: 'wayfair',
+        brandName: 'Wayfair',
+        image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=600&fit=crop',
+        description: 'Luxury L-shaped sectional with premium fabric',
+        rating: 4.8,
+        reviews: 534,
+        url: 'https://www.wayfair.com'
+    },
+    {
+        id: 'partner-5',
+        name: 'Riverside Dining Set',
+        price: 899,
+        category: 'Dining Room',
+        brand: 'wayfair',
+        brandName: 'Wayfair',
+        image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&h=600&fit=crop',
+        description: 'Elegant 7-piece dining set with extending table',
+        rating: 4.7,
+        reviews: 342,
+        url: 'https://www.wayfair.com'
+    },
+    // West Elm Products
+    {
+        id: 'partner-6',
+        name: 'Mid-Century Console',
+        price: 699,
+        category: 'Storage',
+        brand: 'west-elm',
+        brandName: 'West Elm',
+        image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=800&h=600&fit=crop',
+        description: 'Iconic mid-century design with acorn legs',
+        rating: 4.9,
+        reviews: 287,
+        url: 'https://www.westelm.com'
+    },
+    {
+        id: 'partner-7',
+        name: 'Harmony Lounge Chair',
+        price: 549,
+        category: 'Living Room',
+        brand: 'west-elm',
+        brandName: 'West Elm',
+        image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?w=800&h=600&fit=crop',
+        description: 'Contemporary accent chair with curved silhouette',
+        rating: 4.6,
+        reviews: 198,
+        url: 'https://www.westelm.com'
+    },
+    // CB2 Products
+    {
+        id: 'partner-8',
+        name: 'District Carbon Desk',
+        price: 799,
+        category: 'Office',
+        brand: 'cb2',
+        brandName: 'CB2',
+        image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=800&h=600&fit=crop',
+        description: 'Industrial-modern desk with steel frame',
+        rating: 4.8,
+        reviews: 156,
+        url: 'https://www.cb2.com'
+    },
+    {
+        id: 'partner-9',
+        name: 'Flex Modular Sofa',
+        price: 1499,
+        category: 'Living Room',
+        brand: 'cb2',
+        brandName: 'CB2',
+        image: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=800&h=600&fit=crop',
+        description: 'Configurable modular sofa system',
+        rating: 4.7,
+        reviews: 423,
+        url: 'https://www.cb2.com'
+    },
+    // Pottery Barn Products
+    {
+        id: 'partner-10',
+        name: 'Chesterfield Sofa',
+        price: 2199,
+        category: 'Living Room',
+        brand: 'pottery-barn',
+        brandName: 'Pottery Barn',
+        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+        description: 'Classic tufted leather Chesterfield design',
+        rating: 4.9,
+        reviews: 678,
+        url: 'https://www.potterybarn.com'
+    },
+    {
+        id: 'partner-11',
+        name: 'Farmhouse Dining Table',
+        price: 1299,
+        category: 'Dining Room',
+        brand: 'pottery-barn',
+        brandName: 'Pottery Barn',
+        image: 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?w=800&h=600&fit=crop',
+        description: 'Rustic solid wood farmhouse table',
+        rating: 4.8,
+        reviews: 534,
+        url: 'https://www.potterybarn.com'
+    },
+    {
+        id: 'partner-12',
+        name: 'Upholstered Bed',
+        price: 1599,
+        category: 'Bedroom',
+        brand: 'pottery-barn',
+        brandName: 'Pottery Barn',
+        image: 'https://images.unsplash.com/photo-1505693314120-0d443867891c?w=800&h=600&fit=crop',
+        description: 'Luxurious upholstered bed with tufted headboard',
+        rating: 4.9,
+        reviews: 892,
+        url: 'https://www.potterybarn.com'
+    }
+];
+
+// Render partner products
+function renderPartnerProducts(filter = 'all') {
+    const grid = document.getElementById('partnerProductsGrid');
+    if (!grid) return;
+
+    const filteredProducts = filter === 'all' 
+        ? partnerProducts 
+        : partnerProducts.filter(p => p.brand === filter);
+
+    grid.innerHTML = filteredProducts.map(product => `
+        <div class="product-card bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group">
+            <div class="relative overflow-hidden">
+                <img src="${product.image}" 
+                     alt="${product.name}" 
+                     class="w-full h-72 object-cover transform group-hover:scale-110 transition-transform duration-700"
+                     onerror="this.src='https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop'">
+                <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+                    <span class="text-primary font-bold text-sm">${product.brandName}</span>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-body font-semibold text-luxury/60 uppercase tracking-wider">${product.category}</span>
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-star text-secondary text-xs"></i>
+                        <span class="text-sm font-semibold text-primary">${product.rating}</span>
+                        <span class="text-xs text-luxury/60">(${product.reviews})</span>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">${product.name}</h3>
+                <p class="text-luxury/70 font-body text-sm mb-4 line-clamp-2">${product.description}</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="text-3xl font-bold text-secondary">$${product.price}</span>
+                        <span class="text-xs text-luxury/60 font-body">฿${(product.price * EXCHANGE_RATE).toLocaleString()}</span>
+                    </div>
+                    <a href="${product.url}" 
+                       target="_blank"
+                       class="px-6 py-3 bg-primary hover:bg-secondary text-white rounded-full font-body font-semibold text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+                        View <i class="fas fa-external-link-alt ml-2 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Filter partner products by brand
+function filterPartnerProducts(brand) {
+    renderPartnerProducts(brand);
+    
+    // Update active button state
+    document.querySelectorAll('.partner-filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-primary', 'text-white');
+        btn.classList.add('bg-white', 'text-primary', 'border-2', 'border-primary/20');
+    });
+    
+    event.target.classList.add('active', 'bg-primary', 'text-white');
+    event.target.classList.remove('bg-white', 'text-primary', 'border-2', 'border-primary/20');
+}
+
+// Initialize partner products on page load
+document.addEventListener('DOMContentLoaded', () => {
+    renderPartnerProducts();
+});
+
+// ============================================
 // WINDOW GLOBAL FUNCTIONS
 // ============================================
 // Make functions globally available for onclick handlers
@@ -2142,3 +2376,4 @@ window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.handleLogout = handleLogout;
 window.showUserProfile = showUserProfile;
+window.filterPartnerProducts = filterPartnerProducts;
