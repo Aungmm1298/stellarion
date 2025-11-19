@@ -2465,6 +2465,13 @@ let roomCamera = null;
 let roomRenderer = null;
 let roomControls = null;
 let roomObjects = [];
+// Path to the FBX/3D model currently associated with the selected room template
+let currentRoomModelPath = null;
+// Transform controls and selection
+let roomRaycaster = null;
+let roomPointer = new THREE.Vector2();
+let transformControls = null;
+let selectedObject = null;
 
 const roomTemplates = {
     'living-room': {
@@ -2531,26 +2538,50 @@ function closeRoomDesigner() {
         
         // Clean up Three.js resources
         window.removeEventListener('resize', onRoomResize);
-        
+        // Remove pointer & keyboard handlers
+        try { roomRenderer.domElement.removeEventListener('pointerdown', onRoomPointerDown); } catch (e) {}
+        try { window.removeEventListener('keydown', onRoomKeyDown); } catch (e) {}
+
+        if (transformControls) {
+            try { transformControls.detach(); } catch (e) {}
+            try { roomScene.remove(transformControls); } catch (e) {}
+            transformControls = null;
+        }
+
         if (roomRenderer) {
             roomRenderer.dispose();
             roomRenderer.domElement?.remove();
             roomRenderer = null;
         }
         if (roomScene) {
+            // dispose geometries/materials
+            roomScene.traverse(obj => {
+                if (obj.geometry) obj.geometry.dispose?.();
+                if (obj.material) {
+                    if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose?.());
+                    else obj.material.dispose?.();
+                }
+            });
             roomScene.clear();
             roomScene = null;
         }
         roomCamera = null;
         roomControls = null;
         roomObjects = [];
+        selectedObject = null;
         currentRoom = null;
     }
 }
 
-function selectRoomTemplate(templateId) {
+function selectRoomTemplate(templateId, el) {
+    // Allow passing the clicked element so we can read a `data-model` override
+    const clickedEl = el || null;
+    // Prefer explicit data-model on the element, otherwise fall back to mapping
+    const modelFromEl = clickedEl?.dataset?.model || null;
+    currentRoomModelPath = modelFromEl || roomModels[templateId] || null;
+
     currentRoom = roomTemplates[templateId];
-       console.log(templateId)
+    console.log('selectRoomTemplate:', templateId, 'modelPath:', currentRoomModelPath);
     if (currentRoom) {
         document.getElementById('currentRoomName').textContent = currentRoom.name;
         openRoomDesigner();
@@ -2564,89 +2595,192 @@ function selectRoomTemplate(templateId) {
 function initializeRoom3D(templateId) {
     console.log("Selected template:", templateId);
 
-    const canvas = document.getElementById('roomCanvas');
-    if (!canvas) return console.error('Canvas not found');
+    const canvasContainer = document.getElementById('roomCanvas');
+    if (!canvasContainer) return console.error('Canvas container not found');
 
-    // Reset
-    canvas.innerHTML = "";
+    // Hide placeholder overlay instead of removing innerHTML
+    const placeholder = canvasContainer.querySelector('div');
+    if (placeholder) placeholder.style.display = 'none';
+
     roomObjects = [];
 
-    try {
-        // --- Scene ---
-        roomScene = new THREE.Scene();
-        roomScene.background = new THREE.Color(0xf5f0e8);
+    // --- Scene ---
+    roomScene = new THREE.Scene();
+    roomScene.background = new THREE.Color(0xffffff);
 
-        // --- Camera ---
-        const width = canvas.clientWidth || window.innerWidth;
-        const height = canvas.clientHeight || window.innerHeight;
-        roomCamera = new THREE.PerspectiveCamera(60, width / height, 0.1, 2000);
-        roomCamera.position.set(10, 10, 10);
-        roomCamera.lookAt(0, 0, 0);
+    // --- Camera ---
+    const width = canvasContainer.clientWidth || window.innerWidth;
+    const height = canvasContainer.clientHeight || window.innerHeight;
+    roomCamera = new THREE.PerspectiveCamera(60, width / height, 0.1, 2000);
+    roomCamera.position.set(10, 10, 10);
+    roomCamera.lookAt(0, 0, 0);
 
-        // --- Renderer ---
+    // --- Renderer ---
+    if (!roomRenderer) {
         roomRenderer = new THREE.WebGLRenderer({ antialias: true });
+        // Use alpha=false so background color shows as solid white
+        roomRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         roomRenderer.setSize(width, height);
         roomRenderer.setPixelRatio(window.devicePixelRatio);
         roomRenderer.shadowMap.enabled = true;
         roomRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        canvas.appendChild(roomRenderer.domElement);
-
-        // --- Controls ---
-        roomControls = new THREE.OrbitControls(roomCamera, roomRenderer.domElement);
-        roomControls.enableDamping = true;
-        roomControls.dampingFactor = 0.05;
-        roomControls.minDistance = 5;
-        roomControls.maxDistance = 50;
-        roomControls.maxPolarAngle = Math.PI / 2 - 0.05;
-
-        // --- Lights ---
-        addRoomLights();
-
-        // --- Load room model ---
-        loadRoomModel(templateId);
-
-        // --- Drag & Drop ---
-        setupRoomDragDrop();
-
-        // --- Window resize ---
-        window.addEventListener('resize', onRoomResize);
-
-        // --- Animate ---
-        animateRoom();
-
-    } catch (error) {
-        console.error("Error initializing 3D room:", error);
-        canvas.innerHTML = `<div class='text-red-600'>Error loading 3D room.</div>`;
+        // Ensure clear color matches the scene background
+        roomRenderer.setClearColor(0xffffff, 1);
+        canvasContainer.appendChild(roomRenderer.domElement);
+    } else {
+        roomRenderer.setSize(width, height);
     }
+
+    // --- Controls ---
+    roomControls = new THREE.OrbitControls(roomCamera, roomRenderer.domElement);
+    roomControls.enableDamping = true;
+    roomControls.dampingFactor = 0.05;
+    roomControls.minDistance = 5;
+    roomControls.maxDistance = 50;
+    roomControls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+    // --- Lights ---
+    addRoomLights();
+
+        // --- Raycaster & TransformControls ---
+        roomRaycaster = new THREE.Raycaster();
+        roomPointer = new THREE.Vector2();
+
+        if (typeof THREE.TransformControls !== 'undefined') {
+            transformControls = new THREE.TransformControls(roomCamera, roomRenderer.domElement);
+            transformControls.addEventListener('change', () => {
+                // render on transform
+                roomRenderer.render(roomScene, roomCamera);
+            });
+            transformControls.addEventListener('dragging-changed', function (event) {
+                roomControls.enabled = !event.value;
+            });
+            roomScene.add(transformControls);
+        } else {
+            console.warn('TransformControls not found. Gizmos will be disabled.');
+        }
+
+        // Pointer events for selection
+        roomRenderer.domElement.addEventListener('pointerdown', onRoomPointerDown);
+        // Keyboard shortcuts
+        window.addEventListener('keydown', onRoomKeyDown);
+
+    // --- Room geometry ---
+    // NOTE: procedural room generation (createRoom3D) removed.
+    // The designer now loads real room geometry from FBX files stored in `image/Rooms`.
+    if (templateId) {
+        currentRoom = roomTemplates[templateId] || null;
+        // Do not create procedural floor/walls here; FBX should contain the room geometry.
+    }
+
+    // --- Load FBX room model if available ---
+    if (templateId && currentRoomModelPath) {
+        loadRoomModel(templateId, currentRoomModelPath);
+    }
+
+    window.addEventListener('resize', onRoomResize);
+
+    animateRoom();
 }
 
-function loadRoomModel(templateId) {
-    const modelPath = roomModels[templateId];
-    console.log(modelPath);
-    if (!modelPath) return console.warn("No FBX found for template:", templateId);
+
+/**
+ * Display room template parameters (name, dimensions, colors, model path).
+ * Inserts or updates a small overlay in the room designer area.
+ * @param {string|null} templateId
+ */
+function showRoomParameters(templateId) {
+    const canvas = document.getElementById('roomCanvas');
+    if (!canvas) return;
+
+    let tpl = null;
+    if (templateId && roomTemplates[templateId]) tpl = roomTemplates[templateId];
+    else if (currentRoom) tpl = currentRoom;
+
+    // Create overlay container if missing
+    let overlay = document.getElementById('roomParams');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'roomParams';
+        overlay.style.position = 'absolute';
+        overlay.style.right = '12px';
+        overlay.style.top = '12px';
+        overlay.style.background = 'rgba(255,255,255,0.9)';
+        overlay.style.padding = '8px 12px';
+        overlay.style.borderRadius = '8px';
+        overlay.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+        overlay.style.fontSize = '13px';
+        overlay.style.color = '#1f2937';
+        overlay.style.zIndex = '50';
+        canvas.appendChild(overlay);
+    }
+
+    if (!tpl) {
+        overlay.innerHTML = `<div style="font-weight:600;margin-bottom:6px;">Room Template</div><div style="color:#6b7280;">No template selected</div>`;
+        return;
+    }
+
+    // Prefer the explicit currentRoomModelPath (set when user clicked a preview), otherwise fall back to mapping
+    const modelPath = currentRoomModelPath || (templateId && roomModels[templateId]) || '';
+    overlay.innerHTML = `
+        <div style="font-weight:700;margin-bottom:6px;">${tpl.name || 'Room'}</div>
+        <div style="color:#374151;margin-bottom:6px;"><strong>Dimensions:</strong> ${tpl.dimensions.width} x ${tpl.dimensions.length} x ${tpl.dimensions.height} (W×L×H)</div>
+        <div style="color:#374151;margin-bottom:6px;"><strong>Floor:</strong> <span style="display:inline-block;width:12px;height:12px;background:${tpl.floor};border-radius:2px;vertical-align:middle;margin-left:6px;border:1px solid #ddd"></span></div>
+        <div style="color:#374151;margin-bottom:6px;"><strong>Walls:</strong> <span style="display:inline-block;width:12px;height:12px;background:${tpl.walls};border-radius:2px;vertical-align:middle;margin-left:6px;border:1px solid #ddd"></span></div>
+        <div style="color:#374151;"><strong>Model:</strong> ${modelPath || 'N/A'}</div>
+    `;
+}
+
+function loadRoomModel(templateId, modelPathOverride) {
+    const modelPath = modelPathOverride || roomModels[templateId];
+    console.log('Attempting loadRoomModel, path =', modelPath);
+    if (!modelPath) return console.warn("No FBX found for template:", templateId, '(no mapping or override)');
+
+    // Ensure FBXLoader is available
+    if (typeof THREE.FBXLoader === 'undefined') {
+        console.error('THREE.FBXLoader is not available. Make sure examples/js/loaders/FBXLoader.js is included.');
+        return;
+    }
 
     const loader = new THREE.FBXLoader();
-    loader.load(
-        modelPath,
-        function (object) {
-            object.scale.set(0.1, 0.1, 0.1); // adjust as needed
-            object.position.set(1, 1, 1);
+loader.load(
+    modelPath,
+    function (object) {
+        // auto-scale
+        const box = new THREE.Box3().setFromObject(object);
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const scale = 6 / maxDim;
+        object.scale.setScalar(scale);
 
-            object.traverse(child => {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-            });
+        // re-center
+        const center = box.getCenter(new THREE.Vector3());
+        object.position.sub(center);
+
+        object.traverse(child => {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                child.userData.selectable = true;
+            }
+        });
 
             roomScene.add(object);
-            console.log("Room model loaded:", modelPath);
-        },
-        undefined,
-        function (error) {
-            console.error("FBX Load Error:", error);
-        }
-    );
+            console.log("FBX loaded:", modelPath);
+
+            // After adding model, frame it: center camera and adjust distance
+            try {
+                frameModel(object);
+            } catch (err) {
+                console.warn('frameModel failed:', err);
+            }
+    },
+    undefined,
+    function (err) {
+        console.error("FBX Load Error:", err);
+    }
+);
+
 }
 
 function onRoomResize() {
@@ -2659,6 +2793,33 @@ function onRoomResize() {
     roomCamera.aspect = width / height;
     roomCamera.updateProjectionMatrix();
     roomRenderer.setSize(width, height);
+}
+
+/**
+ * Frame an object in the room camera by computing its bounding box and setting camera position/controls target
+ * @param {THREE.Object3D} object
+ */
+function frameModel(object) {
+    if (!object || !roomCamera || !roomControls) return;
+
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    // Determine a distance that fits the object in view
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = roomCamera.fov * (Math.PI / 180);
+    let distance = Math.abs(maxDim / Math.sin(fov / 2));
+    if (!isFinite(distance) || distance === 0) distance = maxDim * 2 + 10;
+
+    // Position camera along a diagonal so users see depth
+    const offset = new THREE.Vector3(distance, distance * 0.6, distance);
+    roomCamera.position.copy(center.clone().add(offset));
+    roomCamera.lookAt(center);
+
+    // Update orbit controls target
+    roomControls.target.copy(center);
+    roomControls.update();
 }
 
 function createRoom3D() {
@@ -2780,12 +2941,21 @@ function addFurnitureToRoom(furnitureId, clientX, clientY) {
     raycaster.setFromCamera(new THREE.Vector2(x, y), roomCamera);
     
     const floor = roomScene.children.find(obj => obj.geometry?.type === 'PlaneGeometry' && obj.rotation.x < 0);
-    if (!floor) return;
+    let position = null;
 
-    const intersects = raycaster.intersectObject(floor);
-    if (intersects.length === 0) return;
-
-    const position = intersects[0].point;
+    if (floor) {
+        const intersects = raycaster.intersectObject(floor);
+        if (intersects.length === 0) return;
+        position = intersects[0].point;
+    } else {
+        // No procedural floor available (we rely on FBX room).
+        // Fallback: intersect the ray with the world XZ plane at y=0 so furniture can still be placed.
+        const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const hitPoint = new THREE.Vector3();
+        const intersectsPlane = raycaster.ray.intersectPlane(groundPlane, hitPoint);
+        if (!intersectsPlane) return;
+        position = hitPoint;
+    }
 
     // Create furniture placeholder (box for now)
     let furnitureObj;
@@ -2827,6 +2997,75 @@ function addFurnitureToRoom(furnitureId, clientX, clientY) {
     roomFurniture.push({ furniture, position: furnitureObj.position.toArray(), rotation: furnitureObj.rotation.toArray() });
 
     console.log(`Added ${furniture.name} to room at`, position);
+}
+
+function onRoomPointerDown(event) {
+    if (!roomRenderer || !roomScene || !roomCamera) return;
+    const rect = roomRenderer.domElement.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    roomPointer.set(x, y);
+    roomRaycaster.setFromCamera(roomPointer, roomCamera);
+
+    // Intersect only selectable meshes
+    const intersects = roomRaycaster.intersectObjects(roomScene.children, true)
+        .filter(i => i.object.userData && i.object.userData.selectable);
+
+    if (intersects.length > 0) {
+        const picked = intersects[0].object;
+        // Find top-level parent within scene to attach transform
+        let attachObj = picked;
+        while (attachObj.parent && attachObj.parent !== roomScene) {
+            attachObj = attachObj.parent;
+        }
+
+        selectedObject = attachObj;
+
+        if (transformControls) {
+            transformControls.attach(selectedObject);
+        }
+
+        // Highlight: simple emissive tint on picked meshes
+        try {
+            picked.material = picked.material || picked.userData.originalMaterial;
+            if (!picked.userData._originalEmissive) picked.userData._originalEmissive = picked.material.emissive ? picked.material.emissive.clone() : null;
+            if (picked.material.emissive) picked.material.emissive.setHex(0x444444);
+        } catch (e) {
+            // ignore material tinting errors
+        }
+
+        // Update properties panel if present
+        const props = document.getElementById('itemProperties');
+        if (props) {
+            props.innerHTML = `<div class="text-left"><strong>Selected:</strong><div>${selectedObject.name || selectedObject.type}</div><div class="text-xs text-gray-500 mt-2">Use W/E/R to change gizmo mode, Del to remove</div></div>`;
+        }
+    } else {
+        // Clicked empty space: detach
+        if (transformControls) transformControls.detach();
+        selectedObject = null;
+        const props = document.getElementById('itemProperties');
+        if (props) props.innerHTML = `<i class="fas fa-hand-pointer text-4xl text-gray-300 mb-3"></i><p class="text-gray-500 font-body text-sm">Select an item to view properties</p>`;
+    }
+}
+
+function onRoomKeyDown(e) {
+    if (!transformControls) return;
+
+    const key = e.key.toLowerCase();
+    if (key === 'w') {
+        transformControls.setMode('translate');
+    } else if (key === 'e') {
+        transformControls.setMode('rotate');
+    } else if (key === 'r') {
+        transformControls.setMode('scale');
+    } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedObject && selectedObject.parent) {
+            selectedObject.parent.remove(selectedObject);
+            transformControls.detach();
+            selectedObject = null;
+        }
+    }
 }
 
 function animateRoom() {

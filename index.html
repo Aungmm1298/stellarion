@@ -7,7 +7,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🛋️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/loaders/FBXLoader.js"></script>
+    <!-- FBX/GLTF loaders will be included after Three core below -->
 
     <script>
         tailwind.config = {
@@ -39,10 +39,14 @@
 
 <!-- fflate (required for FBXLoader) -->
 <script src="https://cdn.jsdelivr.net/npm/fflate/umd/fflate.min.js"></script>
+<script src="https://unpkg.com/fflate"></script>
 
 <!-- FBXLoader (r128) -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
- <script src="https://unpkg.com/fflate"></script>
+<!-- GLTFLoader for .glb/.gltf product models -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<!-- TransformControls for object manipulation (gizmos) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
     <style>
         body {
             font-family: 'Lato', sans-serif;
@@ -942,7 +946,7 @@
 
             <!-- Sample Room Templates Preview -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('living-room')">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('living-room', this)" data-model="./image/Rooms/Room1.fbx">
                     <div class="relative h-64 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800" alt="Living Room" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -957,7 +961,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('bedroom')">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('bedroom', this)" data-model="./image/Rooms/Room2.fbx">
                     <div class="relative h-64 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800" alt="Bedroom" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -972,7 +976,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('dining-room')">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="selectRoomTemplate('dining-room', this)" data-model="./image/Rooms/Room3.fbx">
                     <div class="relative h-64 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800" alt="Dining Room" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -1105,14 +1109,15 @@
                     </div>
 
                     <!-- 3D Canvas -->
-                    <div class="flex-1 relative" id="roomCanvas">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="text-center">
-                                <i class="fas fa-cube text-6xl text-gray-400 mb-4"></i>
-                                <p class="text-gray-600 font-body text-lg">Select a room template to start designing</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="flex-1 relative" id="roomCanvas" style="height: 600px;">
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div class="text-center">
+            <i class="fas fa-cube text-6xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600 font-body text-lg">Select a room template to start designing</p>
+        </div>
+    </div>
+</div>
+
 
                     <!-- Instructions -->
                     <div class="bg-white border-t border-gray-200 px-6 py-3">
