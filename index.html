@@ -60,41 +60,100 @@
         <!-- Main Content -->
         <main class="flex-1 flex items-center justify-center p-10 bg-gray-50">
             <!-- Upload Section -->
-            <div id="uploadSection" class="w-full max-w-3xl">
-                <div class="bg-white rounded-xl p-16 shadow-lg">
-                    <div id="uploadBox" class="text-center py-20 px-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:border-adobe-blue hover:bg-blue-50 transition-all duration-300 cursor-pointer">
-                        <div class="mb-6">
-                            <svg class="mx-auto text-adobe-blue" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M7 18C4.23858 18 2 15.7614 2 13C2 10.2386 4.23858 8 7 8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8H17.5C19.9853 8 22 10.0147 22 12.5C22 14.9853 19.9853 17 17.5 17H16"></path>
-                                <path d="M12 21V13M12 13L9 16M12 13L15 16"></path>
-                            </svg>
+            <div id="uploadSection" class="w-full max-w-6xl">
+                <div class="grid lg:grid-cols-2 gap-8 items-start">
+                    
+                    <!-- Left Side: Upload Area -->
+                    <div class="bg-white rounded-xl p-10 shadow-lg">
+                        <div id="uploadBox" class="text-center py-16 px-8 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:border-adobe-blue hover:bg-blue-50 transition-all duration-300 cursor-pointer">
+                            <div class="mb-6">
+                                <svg class="mx-auto text-adobe-blue" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M7 18C4.23858 18 2 15.7614 2 13C2 10.2386 4.23858 8 7 8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8H17.5C19.9853 8 22 10.0147 22 12.5C22 14.9853 19.9853 17 17.5 17H16"></path>
+                                    <path d="M12 21V13M12 13L9 16M12 13L15 16"></path>
+                                </svg>
+                            </div>
+                            <h2 class="text-2xl font-semibold text-gray-900 mb-3">Drop an image to remove the background</h2>
+                            <p class="text-gray-600 mb-8">or click to upload</p>
+                            <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg" hidden>
+                            <button id="uploadBtn" class="bg-adobe-blue text-white px-9 py-3.5 rounded-full font-semibold text-base shadow-lg hover:bg-[#1e96eb] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200">Upload Image</button>
+                            <p class="text-gray-500 text-sm mt-5">Accepts JPG, PNG files up to 10MB</p>
                         </div>
-                        <h2 class="text-2xl font-semibold text-gray-900 mb-3">Drop an image to remove the background</h2>
-                        <p class="text-gray-600 mb-8">or click to upload</p>
-                        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg" hidden>
-                        <button id="uploadBtn" class="bg-adobe-blue text-white px-9 py-3.5 rounded-full font-semibold text-base shadow-lg hover:bg-[#1e96eb] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200">Upload Image</button>
-                        <p class="text-gray-500 text-sm mt-5">Accepts JPG, PNG files up to 10MB</p>
+
+                        <div class="flex flex-col gap-3 mt-8 pt-6 border-t border-gray-200">
+                            <div class="flex items-center gap-2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span class="text-gray-700 font-medium">Instant processing</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span class="text-gray-700 font-medium">High quality results</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span class="text-gray-700 font-medium">Professional edges</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex justify-center gap-8 mt-10 pt-8 border-t border-gray-200">
-                        <div class="flex items-center gap-2">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"></polyline>
+
+                    <!-- Right Side: Photography Tips -->
+                    <div class="bg-white rounded-xl p-10 shadow-lg">
+                        <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
                             </svg>
-                            <span class="text-gray-700 font-medium">Instant processing</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            <span class="text-gray-700 font-medium">High quality results</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            <span class="text-gray-700 font-medium">Professional edges</span>
+                            Photography Tips
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex gap-3">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-adobe-blue flex items-center justify-center text-white text-sm font-bold">1</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-1">Use Good Lighting</h4>
+                                    <p class="text-gray-600 text-sm">Take photos in bright, even lighting. Avoid shadows, reflections, or direct sunlight.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-adobe-blue flex items-center justify-center text-white text-sm font-bold">2</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-1">Keep a Simple Background</h4>
+                                    <p class="text-gray-600 text-sm">Use a plain wall or clean surface. Avoid messy rooms, patterns, or other objects behind the furniture.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-adobe-blue flex items-center justify-center text-white text-sm font-bold">3</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-1">Capture the Full Furniture</h4>
+                                    <p class="text-gray-600 text-sm">Make sure the entire furniture is inside the frame. Leave a little space around the object (not too tight). Don't crop edges.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-adobe-blue flex items-center justify-center text-white text-sm font-bold">4</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-1">If Object is Unclear, Change Angle</h4>
+                                    <p class="text-gray-600 text-sm">If the furniture shape cannot be seen clearly, try taking the picture from different angles (front, side, or 45° view).</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-adobe-blue flex items-center justify-center text-white text-sm font-bold">5</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-1">Avoid Blurry Photos</h4>
+                                    <p class="text-gray-600 text-sm">Hold your phone steady or use a stand. Make sure the image is clear and sharp.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -243,7 +302,7 @@
     </main>
 
     <footer class="bg-white border-t border-gray-200 py-4 text-center">
-        <p class="text-sm text-gray-600">Powered by AI • U²Net & Real-ESRGAN • © 2025 Hylife</p>
+        <p class="text-sm text-gray-600">Powered by Stellarion</p>
     </footer>
     </div>
 
